@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מערכת שעות שבועית מתקדמת</title>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --surface: #ffffff;
+            --surface-glass: rgba(255, 255, 255, 0.85);
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+
+            --vacation-bg: #f3e8ff;
+            --vacation-border: #c084fc;
+            --vacation-text: #6b21a8;
+
+            --event-bg: #fffbeb;
+            --event-border: #f59e0b;
+            --event-text: #92400e;
+
+            --school-event-bg: #eff6ff;
+            --school-event-border: #3b82f6;
+            --school-event-text: #1e40af;
+
+            --success-bg: #ecfdf5;
+            --success-border: #10b981;
+            --success-text: #047857;
+
+            --danger-bg: #fff1f2;
+            --danger-border: #f43f5e;
+            --danger-text: #be123c;
+
+            --radius-lg: 24px;
+            --radius-md: 14px;
+            --radius-sm: 8px;
+
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+            --shadow-md: 0 12px 28px -6px rgba(15,23,42,0.08);
+        }
+
+        /* Dark Mode - עיצוב עמוק ומודרני */
+        body.dark-theme {
+            --bg-main: #0b0f19;
+            --surface: #151d2a;
+            --surface-glass: rgba(21, 29, 42, 0.85);
+            --primary: #818cf8;
+            --primary-hover: #6366f1;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #26334d;
+
+            --vacation-bg: rgba(168, 85, 247, 0.15);
+            --vacation-border: #a855f7;
+            --vacation-text: #e9d5ff;
+
+            --event-bg: rgba(245, 158, 11, 0.15);
+            --event-border: #f59e0b;
+            --event-text: #fef3c7;
+
+            --school-event-bg: rgba(59, 130, 246, 0.15);
+            --school-event-border: #3b82f6;
+            --school-event-text: #dbeafe;
+
+            --success-bg: rgba(16, 185, 129, 0.15);
+            --success-border: #10b981;
+            --success-text: #a7f3d0;
+
+            --danger-bg: rgba(244, 63, 94, 0.15);
+            --danger-border: #f43f5e;
+            --danger-text: #fecdd3;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Heebo', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            padding: 24px 16px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: var(--surface-glass);
+            backdrop-filter: blur(12px);
+            padding: 20px 24px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-md);
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header-title-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .header-title-area h1 {
+            font-size: 1.6rem;
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, var(--primary) 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* ווידג'טים בסרגל העליון */
+        .live-tracker-pill {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #10b981;
+            box-shadow: 0 0 8px #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        .holiday-countdown-pill {
+            background: var(--vacation-bg);
+            color: var(--vacation-text);
+            border: 1px solid var(--vacation-border);
+            padding: 8px 14px;
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+            font-weight: 800;
+        }
+
+        .legend {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            background: var(--bg-main);
+            padding: 8px 14px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            font-size: 0.78rem;
+            font-weight: 700;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .controls-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tool-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-main);
+            padding: 6px 12px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .input-select {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 5px 8px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            outline: none;
+            background: var(--surface);
+            cursor: pointer;
+        }
+
+        .search-input {
+            width: 130px;
+        }
+
+        .btn {
+            background-color: var(--surface);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+        }
+
+        .week-range {
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--text-main);
+            padding: 8px 14px;
+            background: var(--bg-main);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+        }
+
+        /* סרגל התקדמות יומית */
+        .day-progress-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 10px 18px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .day-progress-text {
+            font-size: 0.88rem;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .day-progress-bar-bg {
+            flex: 1;
+            height: 8px;
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .day-progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, #a855f7 100%);
+            border-radius: 999px;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        /* טבלת מערכת */
+        .grid-wrapper {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-md);
+            overflow-x: auto;
+        }
+
+        table.schedule-grid {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+            table-layout: fixed;
+        }
+
+        table.schedule-grid th {
+            background: var(--bg-main);
+            padding: 14px 10px;
+            font-size: 0.92rem;
+            font-weight: 800;
+            border-bottom: 1px solid var(--border);
+            border-left: 1px solid var(--border);
+            text-align: center;
+            vertical-align: top;
+        }
+
+        table.schedule-grid th:last-child {
+            border-left: none;
+        }
+
+        .date-sub {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        .events-container {
+            margin-top: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .event-badge {
+            background: var(--event-bg);
+            color: var(--event-text);
+            border: 1px solid var(--event-border);
+            border-radius: var(--radius-sm);
+            padding: 5px 8px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .event-badge.school-event {
+            background: var(--school-event-bg);
+            color: var(--school-event-text);
+            border-color: var(--school-event-border);
+        }
+
+        .event-badge .remove-btn {
+            cursor: pointer;
+            margin-right: 6px;
+            font-weight: bold;
+            opacity: 0.7;
+        }
+
+        .add-event-btn {
+            background: transparent;
+            border: 1.5px dashed var(--primary);
+            color: var(--primary);
+            border-radius: var(--radius-sm);
+            padding: 5px 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+            width: 100%;
+        }
+
+        .add-event-btn:hover {
+            background: var(--bg-main);
+        }
+
+        table.schedule-grid td {
+            border-bottom: 1px solid var(--border);
+            border-left: 1px solid var(--border);
+            padding: 6px;
+            vertical-align: top;
+            height: 110px;
+        }
+
+        table.schedule-grid td:last-child {
+            border-left: none;
+        }
+
+        .time-col {
+            width: 95px;
+            background: var(--bg-main);
+            text-align: center;
+            vertical-align: middle !important;
+            font-size: 0.85rem;
+            font-weight: 800;
+        }
+
+        .time-col span {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        .lesson-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 8px 10px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+        }
+
+        .lesson-card.dimmed {
+            opacity: 0.15;
+            filter: grayscale(1);
+        }
+
+        .lesson-card.highlighted {
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 12px rgba(99, 102, 241, 0.35);
+        }
+
+        .lesson-card.active-now {
+            border: 2px solid #10b981;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .lesson-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .lesson-title {
+            font-weight: 800;
+            font-size: 0.88rem;
+        }
+
+        .note-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+            opacity: 0.6;
+            padding: 0 2px;
+        }
+
+        .note-btn:hover { opacity: 1; }
+
+        .lesson-note-tag {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--primary);
+            background: var(--bg-main);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            margin-top: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .status-actions {
+            display: flex;
+            gap: 4px;
+            margin-top: 6px;
+        }
+
+        .action-btn {
+            flex: 1;
+            border: 1px solid var(--border);
+            background: var(--bg-main);
+            color: var(--text-main);
+            border-radius: var(--radius-sm);
+            padding: 4px 0;
+            font-size: 0.78rem;
+            cursor: pointer;
+        }
+
+        .action-btn:hover {
+            background: var(--border);
+        }
+
+        .lesson-card.held {
+            background: var(--success-bg) !important;
+            border-color: var(--success-border) !important;
+        }
+        .lesson-card.held .lesson-title { color: var(--success-text) !important; }
+
+        .lesson-card.canceled {
+            background: var(--danger-bg) !important;
+            border-color: var(--danger-border) !important;
+        }
+        .lesson-card.canceled .lesson-title {
+            color: var(--danger-text) !important;
+            text-decoration: line-through;
+        }
+
+        .vacation-cell {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--vacation-bg);
+            color: var(--vacation-text);
+            font-size: 0.82rem;
+            font-weight: 800;
+            border-radius: var(--radius-md);
+            border: 1.5px solid var(--vacation-border);
+            text-align: center;
+            padding: 6px;
+        }
+
+        /* חלק תחתון: סטטיסטיקות וגיבוי */
+        .bottom-section {
+            margin-top: 24px;
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .box-header h2 {
+            font-size: 1.25rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stats-summary-pills {
+            display: flex;
+            gap: 10px;
+        }
+
+        .summary-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: var(--radius-md);
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .summary-pill.success {
+            background: var(--success-bg);
+            color: var(--success-text);
+        }
+
+        .summary-pill.danger {
+            background: var(--danger-bg);
+            color: var(--danger-text);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 14px;
+        }
+
+        .subject-card {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .subject-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .subject-name {
+            font-weight: 800;
+            font-size: 0.92rem;
+        }
+
+        .subject-percent {
+            font-weight: 900;
+            font-size: 1rem;
+            color: var(--primary);
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: var(--border);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #059669);
+            border-radius: 999px;
+        }
+
+        .subject-badges {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        /* סרגל גיבוי נתונים */
+        .backup-bar {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .backup-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* מודאל */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: var(--surface);
+            padding: 28px;
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 32px -8px rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+        }
+
+        .modal h3 {
+            margin-bottom: 16px;
+            font-weight: 900;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: var(--text-muted);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            outline: none;
+            background: var(--bg-main);
+            color: var(--text-main);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .form-row .form-group { flex: 1; }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="header-title-area">
+            <h1>מערכת שעות שבועית</h1>
+            <div class="live-tracker-pill">
+                <div class="live-dot"></div>
+                <span id="liveTrackerText">בודק שיעור פעיל...</span>
+            </div>
+            <div class="holiday-countdown-pill" id="holidayCountdownText">
+                🎉 מחשב חופשה קרובה...
+            </div>
+            <div class="legend">
+                <div class="legend-item"><div class="legend-dot" style="background: var(--vacation-border);"></div>חופשה</div>
+                <div class="legend-item"><div class="legend-dot" style="background: var(--school-event-border);"></div>אירוע ביה"ס</div>
+                <div class="legend-item"><div class="legend-dot" style="background: var(--event-border);"></div>מבחן/אירוע אישי</div>
+                <div class="legend-item"><div class="legend-dot" style="background: var(--success-border);"></div>התקיים</div>
+                <div class="legend-item"><div class="legend-dot" style="background: var(--danger-border);"></div>בוטל</div>
+            </div>
+        </div>
+
+        <div class="controls-bar">
+            <div class="tool-group">
+                <label for="searchInput">🔍 חיפוש:</label>
+                <input type="text" id="searchInput" class="input-select search-input" placeholder="חפש מקצוע..." oninput="handleSearch(this.value)">
+            </div>
+
+            <div class="tool-group">
+                <label for="subjectFilter">סינון:</label>
+                <select id="subjectFilter" class="input-select" onchange="highlightSubject(this.value)">
+                    <option value="">הצג הכל</option>
+                </select>
+            </div>
+
+            <button class="btn" id="prevWeekBtn" onclick="changeWeek(-1)">◀</button>
+            <span class="week-range" id="weekDisplay">--/-- - --/--</span>
+            <button class="btn" onclick="goToCurrentWeek()">השבוע</button>
+            <button class="btn" onclick="changeWeek(1)">▶</button>
+
+            <button class="btn" onclick="toggleDarkMode()" title="מצב לילה/יום">🌙</button>
+        </div>
+    </header>
+
+    <div class="day-progress-container">
+        <span class="day-progress-text" id="dayProgressText">התקדמות יום הלימודים: 0%</span>
+        <div class="day-progress-bar-bg">
+            <div class="day-progress-bar-fill" id="dayProgressBarFill"></div>
+        </div>
+    </div>
+
+    <div class="grid-wrapper">
+        <table class="schedule-grid">
+            <thead>
+                <tr>
+                    <th style="width: 95px;">שעה</th>
+                    <th id="th-0">ראשון <span class="date-sub" id="date-0"></span></th>
+                    <th id="th-1">שני <span class="date-sub" id="date-1"></span></th>
+                    <th id="th-2">שלישי <span class="date-sub" id="date-2"></span></th>
+                    <th id="th-3">רביעי <span class="date-sub" id="date-3"></span></th>
+                    <th id="th-4">חמישי <span class="date-sub" id="date-4"></span></th>
+                    <th id="th-5">שישי <span class="date-sub" id="date-5"></span></th>
+                </tr>
+            </thead>
+            <tbody id="scheduleBody"></tbody>
+        </table>
+    </div>
+
+    <div class="bottom-section">
+        <div class="box-header">
+            <h2>📊 סיכום נוכחות מצטבר</h2>
+            <div class="stats-summary-pills">
+                <div class="summary-pill success">
+                    <span>התקיימו:</span>
+                    <strong id="totalHeld">0</strong>
+                </div>
+                <div class="summary-pill danger">
+                    <span>בוטלו:</span>
+                    <strong id="totalCanceled">0</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-grid" id="statsGrid"></div>
+
+        <div class="backup-bar">
+            <span>💾 הנתונים שמורים בדפדפן שלך</span>
+            <div class="backup-actions">
+                <button class="btn" onclick="exportData()">ייצוא גיבוי (JSON)</button>
+                <button class="btn" onclick="document.getElementById('importFileInput').click()">שחזור מגיבוי</button>
+                <input type="file" id="importFileInput" style="display:none;" accept=".json" onchange="importData(event)">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="eventModal">
+    <div class="modal">
+        <h3 id="modalTitle">הוספת אירוע / מבחן</h3>
+        <div class="form-group">
+            <label for="eventTitleInput">תיאור האירוע / שם המבחן:</label>
+            <input type="text" id="eventTitleInput" class="form-control" placeholder="לדוגמה: מבחן במתמטיקה">
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="startHourSelect">משעה:</label>
+                <select id="startHourSelect" class="form-control"></select>
+            </div>
+            <div class="form-group">
+                <label for="endHourSelect">עד שעה:</label>
+                <select id="endHourSelect" class="form-control"></select>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn" onclick="closeEventModal()">ביטול</button>
+            <button class="btn btn-primary" onclick="saveEvent()">שמור אירוע</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const START_DATE = new Date('2026-09-01');
+    START_DATE.setHours(0, 0, 0, 0);
+
+    const dayNames = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי"];
+
+    const holidays = [
+        { name: "ראש השנה", start: "2026-09-11", end: "2026-09-13" },
+        { name: "יום כיפור", start: "2026-09-20", end: "2026-09-21" },
+        { name: "גשר כיפור-סוכות", start: "2026-09-22", end: "2026-09-24" },
+        { name: "סוכות", start: "2026-09-25", end: "2026-10-03" },
+        { name: "חנוכה", start: "2026-12-06", end: "2026-12-12" },
+        { name: "פורים", start: "2027-03-23", end: "2027-03-24" },
+        { name: "פסח", start: "2027-04-13", end: "2027-04-28" },
+        { name: "יום העצמאות", start: "2027-05-12", end: "2027-05-12" },
+        { name: "שבועות", start: "2027-06-10", end: "2027-06-11" }
+    ];
+
+    const schoolEvents = {
+        "2026-11-09": "חג הסיגד (יום לימודים)",
+        "2027-03-22": "תענית אסתר (יום לימודים)",
+        "2027-04-29": "אסרו חג פסח (יום לימודים)",
+        "2027-05-25": "ל\"ג בעומר (יום לימודים)",
+        "2027-06-04": "יום ירושלים (יום לימודים)"
+    };
+
+    const hoursConfig = [
+        { id: 0, time: "07:45 - 08:25", start: "07:45", end: "08:25" },
+        { id: 1, time: "08:30 - 09:15", start: "08:30", end: "09:15" },
+        { id: 2, time: "09:15 - 10:00", start: "09:15", end: "10:00" },
+        { id: 3, time: "10:15 - 11:00", start: "10:15", end: "11:00" },
+        { id: 4, time: "11:00 - 11:45", start: "11:00", end: "11:45" },
+        { id: 5, time: "12:00 - 12:45", start: "12:00", end: "12:45" },
+        { id: 6, time: "12:45 - 13:30", start: "12:45", end: "13:30" },
+        { id: 7, time: "13:55 - 14:40", start: "13:55", end: "14:40" },
+        { id: 8, time: "14:40 - 15:25", start: "14:40", end: "15:25" },
+        { id: 9, time: "15:30 - 16:15", start: "15:30", end: "16:15" },
+        { id: 10, time: "16:15 - 17:00", start: "16:15", end: "17:00" }
+    ];
+
+    const schedule = {
+        0: { 3: "אזרחות", 4: "לשון", 5: "אנגלית", 6: "אנגלית", 7: "אנגלית", 8: "מדעי המחשב", 9: "מדעי המחשב" },
+        1: { 1: "מתמטיקה", 2: "מתמטיקה", 3: "מתמטיקה", 4: "לשון", 5: "תנ'ך", 6: "תנ'ך", 7: "חינוך גופני", 8: "פיזיקה", 9: "פיזיקה", 10: "פיזיקה" },
+        2: { 1: "פיזיקה", 2: "פיזיקה", 3: "פיזיקה", 4: "מדעי המחשב", 5: "מדעי המחשב", 6: "מדעי המחשב", 7: "ספרות", 8: "ספרות" },
+        3: { 2: "אנגלית", 3: "היסטוריה", 4: "חינוך גופני", 5: "לשון", 6: "לשון", 7: "מתמטיקה", 8: "מתמטיקה", 9: "היסטוריה" },
+        4: { 0: "ספרות", 1: "ספרות", 2: "אזרחות", 3: "אנגלית", 4: "פיזיקה", 5: "פיזיקה", 6: "פיזיקה", 7: "חינוך", 8: "היסטוריה", 9: "היסטוריה" },
+        5: { 4: "מתמטיקה", 5: "מתמטיקה", 6: "מתמטיקה" }
+    };
+
+    let minSunday = getSunday(START_DATE);
+    let currentSundayDate = getSunday(new Date() < START_DATE ? START_DATE : new Date());
+    
+    let attendanceData = JSON.parse(localStorage.getItem('myWeeklyAttendance')) || {};
+    let eventsData = JSON.parse(localStorage.getItem('myWeeklyEvents')) || {};
+    let notesData = JSON.parse(localStorage.getItem('myWeeklyNotes')) || {};
+    let isDarkMode = localStorage.getItem('myWeeklyDarkMode') === 'true';
+
+    let selectedFilterSubject = "";
+    let searchQuery = "";
+    let activeModalDateStr = null;
+
+    if (isDarkMode) document.body.classList.add('dark-theme');
+
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-theme');
+        localStorage.setItem('myWeeklyDarkMode', document.body.classList.contains('dark-theme'));
+    }
+
+    function getSunday(d) {
+        const date = new Date(d);
+        date.setHours(0, 0, 0, 0);
+        const day = date.getDay();
+        return new Date(date.setDate(date.getDate() - day));
+    }
+
+    function formatDate(date) {
+        const d = new Date(date);
+        return [d.getFullYear(), (d.getMonth() + 1).toString().padStart(2, '0'), d.getDate().toString().padStart(2, '0')].join('-');
+    }
+
+    function formatDisplayDate(date) {
+        const d = new Date(date);
+        return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}`;
+    }
+
+    function getHolidayName(dateStr) {
+        for (let h of holidays) {
+            if (dateStr >= h.start && dateStr <= h.end) return h.name;
+        }
+        return null;
+    }
+
+    function initFilterDropdown() {
+        const select = document.getElementById('subjectFilter');
+        const subjects = new Set();
+        for (let day in schedule) {
+            for (let hour in schedule[day]) subjects.add(schedule[day][hour]);
+        }
+        select.innerHTML = '<option value="">הצג הכל</option>';
+        subjects.forEach(sub => {
+            const opt = document.createElement('option');
+            opt.value = sub;
+            opt.textContent = sub;
+            select.appendChild(opt);
+        });
+    }
+
+    function highlightSubject(subName) {
+        selectedFilterSubject = subName;
+        renderBoard();
+    }
+
+    function handleSearch(val) {
+        searchQuery = val.trim().toLowerCase();
+        renderBoard();
+    }
+
+    function changeWeek(direction) {
+        const target = new Date(currentSundayDate);
+        target.setDate(target.getDate() + (direction * 7));
+        if (target < minSunday) return;
+        currentSundayDate = target;
+        renderBoard();
+    }
+
+    function goToCurrentWeek() {
+        currentSundayDate = getSunday(new Date() < START_DATE ? START_DATE : new Date());
+        renderBoard();
+    }
+
+    function toggleStatus(dateStr, hourId, status) {
+        const key = `${dateStr}_${hourId}`;
+        if (attendanceData[key] === status) delete attendanceData[key];
+        else attendanceData[key] = status;
+        localStorage.setItem('myWeeklyAttendance', JSON.stringify(attendanceData));
+        renderBoard();
+    }
+
+    function addNote(dateStr, hourId) {
+        const key = `${dateStr}_${hourId}`;
+        const currentNote = notesData[key] || '';
+        const newNote = prompt('הכנס הערה קצרה לשיעור זה:', currentNote);
+        if (newNote !== null) {
+            if (newNote.trim() === '') delete notesData[key];
+            else notesData[key] = newNote.trim();
+            localStorage.setItem('myWeeklyNotes', JSON.stringify(notesData));
+            renderBoard();
+        }
+    }
+
+    function openEventModal(dateStr, dayName) {
+        activeModalDateStr = dateStr;
+        document.getElementById('modalTitle').innerText = `הוספת אירוע / מבחן ליום ${dayName}`;
+        document.getElementById('eventTitleInput').value = '';
+        document.getElementById('eventModal').classList.add('active');
+    }
+
+    function closeEventModal() {
+        document.getElementById('eventModal').classList.remove('active');
+    }
+
+    function saveEvent() {
+        const title = document.getElementById('eventTitleInput').value.trim();
+        const startHour = parseInt(document.getElementById('startHourSelect').value);
+        const endHour = parseInt(document.getElementById('endHourSelect').value);
+
+        if (!title || endHour < startHour) return;
+
+        if (!eventsData[activeModalDateStr]) eventsData[activeModalDateStr] = [];
+        eventsData[activeModalDateStr].push({ title, startHour, endHour });
+
+        localStorage.setItem('myWeeklyEvents', JSON.stringify(eventsData));
+        closeEventModal();
+        renderBoard();
+    }
+
+    function removeEvent(dateStr, index) {
+        eventsData[dateStr].splice(index, 1);
+        if (!eventsData[dateStr].length) delete eventsData[dateStr];
+        localStorage.setItem('myWeeklyEvents', JSON.stringify(eventsData));
+        renderBoard();
+    }
+
+    /* עדכון מעקב בזמן אמת + התקדמות יומית */
+    function updateLiveTracker() {
+        const now = new Date();
+        const dayIdx = now.getDay();
+        const currentTimeStr = now.toTimeString().substring(0, 5);
+        const trackerElement = document.getElementById('liveTrackerText');
+
+        if (dayIdx > 5) {
+            trackerElement.innerText = "שבת שלום! אין לימודים היום";
+            updateDayProgress(100, "סוף שבוע קסום!");
+            return;
+        }
+
+        let currentLesson = null;
+        let nextLesson = null;
+
+        hoursConfig.forEach(h => {
+            if (currentTimeStr >= h.start && currentTimeStr <= h.end) {
+                const sub = schedule[dayIdx] ? schedule[dayIdx][h.id] : null;
+                if (sub) currentLesson = { sub, time: h.time };
+            } else if (currentTimeStr < h.start && !nextLesson) {
+                const sub = schedule[dayIdx] ? schedule[dayIdx][h.id] : null;
+                if (sub) nextLesson = { sub, time: h.start };
+            }
+        });
+
+        if (currentLesson) {
+            trackerElement.innerText = `עכשיו: ${currentLesson.sub} (${currentLesson.time})`;
+        } else if (nextLesson) {
+            trackerElement.innerText = `השיעור הבא: ${nextLesson.sub} בשעה ${nextLesson.time}`;
+        } else {
+            trackerElement.innerText = "אין שיעורים נוספים היום";
+        }
+
+        // חישוב התקדמות ליום הלימודים הנוכחי
+        const dayLessons = schedule[dayIdx] ? Object.keys(schedule[dayIdx]).map(Number) : [];
+        if (!dayLessons.length) {
+            updateDayProgress(100, "אין שיעורים מתוכננים להיום");
+            return;
+        }
+
+        const startHourConfig = hoursConfig[Math.min(...dayLessons)];
+        const endHourConfig = hoursConfig[Math.max(...dayLessons)];
+
+        if (currentTimeStr < startHourConfig.start) {
+            updateDayProgress(0, "יום הלימודים טרם החל");
+        } else if (currentTimeStr > endHourConfig.end) {
+            updateDayProgress(100, "יום הלימודים הסתיים!");
+        } else {
+            const [sH, sM] = startHourConfig.start.split(':').map(Number);
+            const [eH, eM] = endHourConfig.end.split(':').map(Number);
+            const [cH, cM] = currentTimeStr.split(':').map(Number);
+
+            const totalMin = (eH * 60 + eM) - (sH * 60 + sM);
+            const passedMin = (cH * 60 + cM) - (sH * 60 + sM);
+            const percent = Math.min(100, Math.max(0, Math.round((passedMin / totalMin) * 100)));
+            updateDayProgress(percent, `התקדמות יום הלימודים: ${percent}%`);
+        }
+    }
+
+    function updateDayProgress(percent, text) {
+        document.getElementById('dayProgressBarFill').style.width = percent + '%';
+        document.getElementById('dayProgressText').innerText = text;
+    }
+
+    /* חישוב ספירה לאחור לחופשה הקרובה */
+    function updateHolidayCountdown() {
+        const today = new Date();
+        today.setHours(0,0,0,0);
+
+        let nextHoliday = null;
+        for (let h of holidays) {
+            const hStart = new Date(h.start);
+            if (hStart >= today) {
+                nextHoliday = { name: h.name, start: hStart };
+                break;
+            }
+        }
+
+        const el = document.getElementById('holidayCountdownText');
+        if (nextHoliday) {
+            const diffTime = nextHoliday.start - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            if (diffDays === 0) {
+                el.innerText = `🎉 חופשת ${nextHoliday.name} מתחילה היום!`;
+            } else {
+                el.innerText = `⏳ עוד ${diffDays} ימים לחופשת ${nextHoliday.name}`;
+            }
+        } else {
+            el.innerText = `🎉 סיום שנת הלימודים קרוב!`;
+        }
+    }
+
+    function renderBoard() {
+        const weekDates = Array.from({length: 6}, (_, i) => {
+            const d = new Date(currentSundayDate);
+            d.setDate(d.getDate() + i);
+            return d;
+        });
+
+        document.getElementById('weekDisplay').innerText = `${formatDisplayDate(weekDates[0])} - ${formatDisplayDate(weekDates[5])}`;
+
+        weekDates.forEach((currentDate, i) => {
+            const dateStr = formatDate(currentDate);
+            const th = document.getElementById(`th-${i}`);
+            const dayEvents = eventsData[dateStr] || [];
+            const holidayName = getHolidayName(dateStr);
+            const schoolEventName = schoolEvents[dateStr];
+
+            let eventsHTML = schoolEventName ? `<div class="event-badge school-event"><span>🎉 ${schoolEventName}</span></div>` : '';
+            if (dayEvents.length) {
+                eventsHTML += '<div class="events-container">' + dayEvents.map((evt, idx) => `
+                    <div class="event-badge">
+                        <span>📝 ${evt.title} (${evt.startHour}-${evt.endHour})</span>
+                        <span class="remove-btn" onclick="removeEvent('${dateStr}', ${idx})">✕</span>
+                    </div>`).join('') + '</div>';
+            }
+
+            const addBtnHTML = (currentDate >= START_DATE && !holidayName) ? `<button class="add-event-btn" onclick="openEventModal('${dateStr}', '${dayNames[i]}')">+ אירוע/מבחן</button>` : '';
+            th.innerHTML = `${dayNames[i]} <span class="date-sub">${formatDisplayDate(currentDate)}</span>${eventsHTML}${addBtnHTML}`;
+        });
+
+        const tbody = document.getElementById('scheduleBody');
+        tbody.innerHTML = '';
+
+        const now = new Date();
+        const todayStr = formatDate(now);
+        const currentTimeStr = now.toTimeString().substring(0, 5);
+
+        hoursConfig.forEach(hour => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td class="time-col">שעה ${hour.id}<span>${hour.time}</span></td>`;
+
+            weekDates.forEach((currentDate, dayIdx) => {
+                const td = document.createElement('td');
+                const dateStr = formatDate(currentDate);
+                const holidayName = getHolidayName(dateStr);
+
+                if (currentDate < START_DATE || holidayName) {
+                    td.innerHTML = `<div class="vacation-cell">🏖️ ${holidayName || 'חופש'}</div>`;
+                    tr.appendChild(td);
+                    return;
+                }
+
+                const subject = schedule[dayIdx] ? schedule[dayIdx][hour.id] : null;
+                const slotKey = `${dateStr}_${hour.id}`;
+                const currentStatus = attendanceData[slotKey];
+                const note = notesData[slotKey];
+
+                if (subject) {
+                    let cardClass = 'lesson-card';
+                    if (currentStatus === 'yes') cardClass += ' held';
+                    if (currentStatus === 'no') cardClass += ' canceled';
+                    
+                    if (dateStr === todayStr && currentTimeStr >= hour.start && currentTimeStr <= hour.end) {
+                        cardClass += ' active-now';
+                    }
+
+                    // סינון והדגשה לפי בחירה או חיפוש
+                    const isSubjectMatch = selectedFilterSubject ? subject === selectedFilterSubject : true;
+                    const isSearchMatch = searchQuery ? subject.toLowerCase().includes(searchQuery) : true;
+
+                    if (!isSubjectMatch || !isSearchMatch) {
+                        cardClass += ' dimmed';
+                    } else if (selectedFilterSubject || searchQuery) {
+                        cardClass += ' highlighted';
+                    }
+
+                    const noteTagHTML = note ? `<div class="lesson-note-tag" title="${note}">📌 ${note}</div>` : '';
+
+                    td.innerHTML = `
+                        <div class="${cardClass}">
+                            <div class="lesson-header-row">
+                                <div class="lesson-title">${subject}</div>
+                                <button class="note-btn" onclick="addNote('${dateStr}', ${hour.id})" title="הוסף הערה">✏️</button>
+                            </div>
+                            ${noteTagHTML}
+                            <div class="status-actions">
+                                <button class="action-btn" onclick="toggleStatus('${dateStr}', ${hour.id}, 'yes')">✅</button>
+                                <button class="action-btn" onclick="toggleStatus('${dateStr}', ${hour.id}, 'no')">❌</button>
+                            </div>
+                        </div>`;
+                }
+                tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+        });
+
+        renderStats();
+        updateLiveTracker();
+        updateHolidayCountdown();
+    }
+
+    function renderStats() {
+        const stats = {};
+        let grandYes = 0, grandNo = 0;
+
+        for (let day in schedule) {
+            for (let hour in schedule[day]) {
+                const name = schedule[day][hour];
+                if (!stats[name]) stats[name] = { yes: 0, no: 0 };
+            }
+        }
+
+        for (let key in attendanceData) {
+            const status = attendanceData[key];
+            const [dateStr, hourId] = key.split('_');
+            const dayIdx = new Date(dateStr).getDay();
+            if (schedule[dayIdx] && schedule[dayIdx][hourId]) {
+                const subject = schedule[dayIdx][hourId];
+                if (stats[subject]) {
+                    if (status === 'yes') { stats[subject].yes++; grandYes++; }
+                    if (status === 'no') { stats[subject].no++; grandNo++; }
+                }
+            }
+        }
+
+        document.getElementById('totalHeld').innerText = grandYes;
+        document.getElementById('totalCanceled').innerText = grandNo;
+
+        const statsGrid = document.getElementById('statsGrid');
+        statsGrid.innerHTML = '';
+
+        for (let subject in stats) {
+            const total = stats[subject].yes + stats[subject].no;
+            const percent = total > 0 ? Math.round((stats[subject].yes / total) * 100) : 0;
+            const card = document.createElement('div');
+            card.className = 'subject-card';
+            card.innerHTML = `
+                <div class="subject-card-top">
+                    <span class="subject-name">${subject}</span>
+                    <span class="subject-percent">${total > 0 ? percent + '%' : '-'}</span>
+                </div>
+                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${percent}%;"></div></div>
+                <div class="subject-badges">
+                    <span>✅ ${stats[subject].yes} התקיימו</span>
+                    <span>❌ ${stats[subject].no} בוטלו</span>
+                </div>`;
+            statsGrid.appendChild(card);
+        }
+    }
+
+    /* ייצוא וייבוא נתונים */
+    function exportData() {
+        const data = { attendanceData, eventsData, notesData };
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", `schedule_backup_${formatDate(new Date())}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+    }
+
+    function importData(event) {
+        const fileReader = new FileReader();
+        fileReader.onload = function (e) {
+            try {
+                const parsed = JSON.parse(e.target.result);
+                if (parsed.attendanceData) localStorage.setItem('myWeeklyAttendance', JSON.stringify(parsed.attendanceData));
+                if (parsed.eventsData) localStorage.setItem('myWeeklyEvents', JSON.stringify(parsed.eventsData));
+                if (parsed.notesData) localStorage.setItem('myWeeklyNotes', JSON.stringify(parsed.notesData));
+                
+                attendanceData = parsed.attendanceData || {};
+                eventsData = parsed.eventsData || {};
+                notesData = parsed.notesData || {};
+                
+                alert('הנתונים שוחזרו בהצלחה!');
+                renderBoard();
+            } catch (err) {
+                alert('קובץ לא תקין');
+            }
+        };
+        fileReader.readAsText(event.target.files[0]);
+    }
+
+    function initModalHours() {
+        const start = document.getElementById('startHourSelect');
+        const end = document.getElementById('endHourSelect');
+        hoursConfig.forEach(h => {
+            start.innerHTML += `<option value="${h.id}">שעה ${h.id} (${h.time})</option>`;
+            end.innerHTML += `<option value="${h.id}">שעה ${h.id} (${h.time})</option>`;
+        });
+    }
+
+    initModalHours();
+    initFilterDropdown();
+    renderBoard();
+    setInterval(updateLiveTracker, 30000);
+</script>
+
+</body>
+</html>
