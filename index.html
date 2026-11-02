@@ -1,1333 +1,1871 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- שם הכרטיסייה בדפדפן -->
-    <title>מערכת שעות חכמה 📅</title>
-
-    <!-- לוגו יפה לכרטיסייה (Favicon) -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📅</text></svg>">
-    <style>
-        :root {
-            --bg-main: #f8fafc;
-            --surface: #ffffff;
-            --surface-glass: rgba(255, 255, 255, 0.85);
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-
-            --vacation-bg: #f3e8ff;
-            --vacation-border: #c084fc;
-            --vacation-text: #6b21a8;
-
-            --event-bg: #fffbeb;
-            --event-border: #f59e0b;
-            --event-text: #92400e;
-
-            --school-event-bg: #eff6ff;
-            --school-event-border: #3b82f6;
-            --school-event-text: #1e40af;
-
-            --success-bg: #ecfdf5;
-            --success-border: #10b981;
-            --success-text: #047857;
-
-            --danger-bg: #fff1f2;
-            --danger-border: #f43f5e;
-            --danger-text: #be123c;
-
-            --radius-lg: 24px;
-            --radius-md: 14px;
-            --radius-sm: 8px;
-
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
-            --shadow-md: 0 12px 28px -6px rgba(15,23,42,0.08);
-        }
-
-        /* Dark Mode - עיצוב עמוק ומודרני */
-        body.dark-theme {
-            --bg-main: #0b0f19;
-            --surface: #151d2a;
-            --surface-glass: rgba(21, 29, 42, 0.85);
-            --primary: #818cf8;
-            --primary-hover: #6366f1;
-            --text-main: #f1f5f9;
-            --text-muted: #94a3b8;
-            --border: #26334d;
-
-            --vacation-bg: rgba(168, 85, 247, 0.15);
-            --vacation-border: #a855f7;
-            --vacation-text: #e9d5ff;
-
-            --event-bg: rgba(245, 158, 11, 0.15);
-            --event-border: #f59e0b;
-            --event-text: #fef3c7;
-
-            --school-event-bg: rgba(59, 130, 246, 0.15);
-            --school-event-border: #3b82f6;
-            --school-event-text: #dbeafe;
-
-            --success-bg: rgba(16, 185, 129, 0.15);
-            --success-border: #10b981;
-            --success-text: #a7f3d0;
-
-            --danger-bg: rgba(244, 63, 94, 0.15);
-            --danger-border: #f43f5e;
-            --danger-text: #fecdd3;
-        }
-
-        * {
-            box-sizing: border-box;
-            font-family: 'Heebo', system-ui, -apple-system, sans-serif;
-            margin: 0;
-            padding: 0;
-            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-        }
-
-        body {
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            padding: 24px 16px;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1440px;
-            margin: 0 auto;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            background: var(--surface-glass);
-            backdrop-filter: blur(12px);
-            padding: 20px 24px;
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-md);
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .header-title-area {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            flex-wrap: wrap;
-        }
-
-        .header-title-area h1 {
-            font-size: 1.6rem;
-            font-weight: 900;
-            letter-spacing: -0.03em;
-            background: linear-gradient(135deg, var(--primary) 0%, #a855f7 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* ווידג'טים בסרגל העליון */
-        .live-tracker-pill {
-            background: var(--bg-main);
-            border: 1px solid var(--border);
-            padding: 8px 14px;
-            border-radius: var(--radius-md);
-            font-size: 0.85rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .live-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: #10b981;
-            box-shadow: 0 0 8px #10b981;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.4; }
-            100% { opacity: 1; }
-        }
-
-        .holiday-countdown-pill {
-            background: var(--vacation-bg);
-            color: var(--vacation-text);
-            border: 1px solid var(--vacation-border);
-            padding: 8px 14px;
-            border-radius: var(--radius-md);
-            font-size: 0.85rem;
-            font-weight: 800;
-        }
-
-        .legend {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            background: var(--bg-main);
-            padding: 8px 14px;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border);
-            font-size: 0.78rem;
-            font-weight: 700;
-            flex-wrap: wrap;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .legend-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-
-        .controls-bar {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .tool-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--bg-main);
-            padding: 6px 12px;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border);
-            font-size: 0.85rem;
-            font-weight: 700;
-        }
-
-        .input-select {
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 5px 8px;
-            font-family: inherit;
-            font-size: 0.85rem;
-            color: var(--text-main);
-            outline: none;
-            background: var(--surface);
-            cursor: pointer;
-        }
-
-        .search-input {
-            width: 130px;
-        }
-
-        .btn {
-            background-color: var(--surface);
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            padding: 8px 14px;
-            border-radius: var(--radius-md);
-            font-weight: 700;
-            font-size: 0.88rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: var(--shadow-sm);
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn:hover:not(:disabled) {
-            border-color: var(--primary);
-            transform: translateY(-1px);
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-        }
-
-        .week-range {
-            font-weight: 800;
-            font-size: 1rem;
-            color: var(--text-main);
-            padding: 8px 14px;
-            background: var(--bg-main);
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border);
-        }
-
-        /* סרגל התקדמות יומית */
-        .day-progress-container {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            padding: 10px 18px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .day-progress-text {
-            font-size: 0.88rem;
-            font-weight: 800;
-            white-space: nowrap;
-        }
-
-        .day-progress-bar-bg {
-            flex: 1;
-            height: 8px;
-            background: var(--bg-main);
-            border: 1px solid var(--border);
-            border-radius: 999px;
-            overflow: hidden;
-        }
-
-        .day-progress-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary) 0%, #a855f7 100%);
-            border-radius: 999px;
-            width: 0%;
-            transition: width 0.4s ease;
-        }
-
-        /* טבלת מערכת */
-        .grid-wrapper {
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-md);
-            overflow-x: auto;
-        }
-
-        table.schedule-grid {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 1000px;
-            table-layout: fixed;
-        }
-
-        table.schedule-grid th {
-            background: var(--bg-main);
-            padding: 14px 10px;
-            font-size: 0.92rem;
-            font-weight: 800;
-            border-bottom: 1px solid var(--border);
-            border-left: 1px solid var(--border);
-            text-align: center;
-            vertical-align: top;
-        }
-
-        table.schedule-grid th:last-child {
-            border-left: none;
-        }
-
-        .date-sub {
-            display: block;
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: var(--text-muted);
-            margin-top: 3px;
-        }
-
-        .events-container {
-            margin-top: 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .event-badge {
-            background: var(--event-bg);
-            color: var(--event-text);
-            border: 1px solid var(--event-border);
-            border-radius: var(--radius-sm);
-            padding: 5px 8px;
-            font-size: 0.74rem;
-            font-weight: 700;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .event-badge.school-event {
-            background: var(--school-event-bg);
-            color: var(--school-event-text);
-            border-color: var(--school-event-border);
-        }
-
-        .event-badge .remove-btn {
-            cursor: pointer;
-            margin-right: 6px;
-            font-weight: bold;
-            opacity: 0.7;
-        }
-
-        .add-event-btn {
-            background: transparent;
-            border: 1.5px dashed var(--primary);
-            color: var(--primary);
-            border-radius: var(--radius-sm);
-            padding: 5px 8px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 8px;
-            width: 100%;
-        }
-
-        .add-event-btn:hover {
-            background: var(--bg-main);
-        }
-
-        table.schedule-grid td {
-            border-bottom: 1px solid var(--border);
-            border-left: 1px solid var(--border);
-            padding: 6px;
-            vertical-align: top;
-            height: 110px;
-        }
-
-        table.schedule-grid td:last-child {
-            border-left: none;
-        }
-
-        .time-col {
-            width: 95px;
-            background: var(--bg-main);
-            text-align: center;
-            vertical-align: middle !important;
-            font-size: 0.85rem;
-            font-weight: 800;
-        }
-
-        .time-col span {
-            display: block;
-            font-size: 0.72rem;
-            font-weight: 500;
-            color: var(--text-muted);
-            margin-top: 3px;
-        }
-
-        .lesson-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            padding: 8px 10px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: var(--shadow-sm);
-            position: relative;
-        }
-
-        .lesson-card.dimmed {
-            opacity: 0.15;
-            filter: grayscale(1);
-        }
-
-        .lesson-card.highlighted {
-            border: 2px solid var(--primary);
-            box-shadow: 0 0 12px rgba(99, 102, 241, 0.35);
-        }
-
-        .lesson-card.active-now {
-            border: 2px solid #10b981;
-            box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
-        }
-
-        .lesson-header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-
-        .lesson-title {
-            font-weight: 800;
-            font-size: 0.88rem;
-        }
-
-        .note-btn {
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            font-size: 0.8rem;
-            opacity: 0.6;
-            padding: 0 2px;
-        }
-
-        .note-btn:hover { opacity: 1; }
-
-        .lesson-note-tag {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--primary);
-            background: var(--bg-main);
-            padding: 2px 6px;
-            border-radius: 4px;
-            border: 1px solid var(--border);
-            margin-top: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .status-actions {
-            display: flex;
-            gap: 4px;
-            margin-top: 6px;
-        }
-
-        .action-btn {
-            flex: 1;
-            border: 1px solid var(--border);
-            background: var(--bg-main);
-            color: var(--text-main);
-            border-radius: var(--radius-sm);
-            padding: 4px 0;
-            font-size: 0.78rem;
-            cursor: pointer;
-        }
-
-        .action-btn:hover {
-            background: var(--border);
-        }
-
-        .lesson-card.held {
-            background: var(--success-bg) !important;
-            border-color: var(--success-border) !important;
-        }
-        .lesson-card.held .lesson-title { color: var(--success-text) !important; }
-
-        .lesson-card.canceled {
-            background: var(--danger-bg) !important;
-            border-color: var(--danger-border) !important;
-        }
-        .lesson-card.canceled .lesson-title {
-            color: var(--danger-text) !important;
-            text-decoration: line-through;
-        }
-
-        .vacation-cell {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: var(--vacation-bg);
-            color: var(--vacation-text);
-            font-size: 0.82rem;
-            font-weight: 800;
-            border-radius: var(--radius-md);
-            border: 1.5px solid var(--vacation-border);
-            text-align: center;
-            padding: 6px;
-        }
-
-        /* חלק תחתון: סטטיסטיקות וגיבוי */
-        .bottom-section {
-            margin-top: 24px;
-            background: var(--surface);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
-            padding: 24px;
-            box-shadow: var(--shadow-md);
-        }
-
-        .box-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .box-header h2 {
-            font-size: 1.25rem;
-            font-weight: 900;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .stats-summary-pills {
-            display: flex;
-            gap: 10px;
-        }
-
-        .summary-pill {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border-radius: var(--radius-md);
-            font-size: 0.82rem;
-            font-weight: 700;
-        }
-
-        .summary-pill.success {
-            background: var(--success-bg);
-            color: var(--success-text);
-        }
-
-        .summary-pill.danger {
-            background: var(--danger-bg);
-            color: var(--danger-text);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 14px;
-        }
-
-        .subject-card {
-            background: var(--bg-main);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            padding: 14px 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .subject-card-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .subject-name {
-            font-weight: 800;
-            font-size: 0.92rem;
-        }
-
-        .subject-percent {
-            font-weight: 900;
-            font-size: 1rem;
-            color: var(--primary);
-        }
-
-        .progress-bar-bg {
-            width: 100%;
-            height: 6px;
-            background: var(--border);
-            border-radius: 999px;
-            overflow: hidden;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #10b981, #059669);
-            border-radius: 999px;
-        }
-
-        .subject-badges {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            font-weight: 700;
-        }
-
-        /* סרגל גיבוי נתונים */
-        .backup-bar {
-            margin-top: 20px;
-            padding-top: 16px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--text-muted);
-        }
-
-        .backup-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        /* מודאל */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(6px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .modal {
-            background: var(--surface);
-            padding: 28px;
-            border-radius: var(--radius-lg);
-            width: 100%;
-            max-width: 420px;
-            box-shadow: 0 20px 32px -8px rgba(0,0,0,0.3);
-            border: 1px solid var(--border);
-        }
-
-        .modal h3 {
-            margin-bottom: 16px;
-            font-weight: 900;
-        }
-
-        .form-group {
-            margin-bottom: 14px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.82rem;
-            font-weight: 700;
-            margin-bottom: 4px;
-            color: var(--text-muted);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 9px 12px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            font-size: 0.9rem;
-            outline: none;
-            background: var(--bg-main);
-            color: var(--text-main);
-        }
-
-        .form-row {
-            display: flex;
-            gap: 10px;
-        }
-
-        .form-row .form-group { flex: 1; }
-
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 20px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f6f6f5">
+<title>מערכת שעות 📅</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📅</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;600;700;800&family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --bg: #f6f6f5;
+        --blob-1: transparent;
+        --blob-2: transparent;
+        --blob-3: transparent;
+        --blob-o: 0;
+        --glass: #ffffff;
+        --glass-strong: #ffffff;
+        --glass-line: transparent;
+        --hair: rgba(0, 0, 0, .08);
+        --soft: rgba(0, 0, 0, .035);
+        --text: #18181b;
+        --muted: #71717a;
+        --primary: #27272a;
+        --primary-soft: rgba(24, 24, 27, .06);
+        --accent: #18181b;
+        --accent-ink: #ffffff;
+        --ok: #15803d;
+        --ok-soft: rgba(22, 163, 74, .08);
+        --bad: #b91c1c;
+        --bad-soft: rgba(220, 38, 38, .07);
+        --warn: #a16207;
+        --warn-soft: rgba(202, 138, 4, .09);
+        --info: #52525b;
+        --info-soft: rgba(0, 0, 0, .05);
+        --vac: #71717a;
+        --vac-soft: rgba(0, 0, 0, .035);
+        --now: #16a34a;
+        --tint-s: 0%;
+        --tint-l: 100%;
+        --tint-a: 1;
+        --ink-s: 0%;
+        --ink-l: 12%;
+        --dot-s: 40%;
+        --dot-l: 55%;
+        --shadow: 0 1px 2px rgba(0, 0, 0, .04);
+        --shadow-lg: 0 20px 40px -16px rgba(0, 0, 0, .2);
+        --r-xl: 28px;
+        --r-lg: 22px;
+        --r-md: 14px;
+        --r-sm: 10px;
+        color-scheme: light;
+    }
+
+    [data-theme="dark"] {
+        --bg: #0c0c0e;
+        --glass: #151518;
+        --glass-strong: #1c1c20;
+        --hair: rgba(255, 255, 255, .08);
+        --soft: rgba(255, 255, 255, .035);
+        --text: #f4f4f5;
+        --muted: #a1a1aa;
+        --primary: #e4e4e7;
+        --primary-soft: rgba(255, 255, 255, .07);
+        --accent: #f4f4f5;
+        --accent-ink: #0c0c0e;
+        --ok: #4ade80;
+        --ok-soft: rgba(74, 222, 128, .09);
+        --bad: #f87171;
+        --bad-soft: rgba(248, 113, 113, .09);
+        --warn: #eab308;
+        --warn-soft: rgba(234, 179, 8, .09);
+        --info: #a1a1aa;
+        --info-soft: rgba(255, 255, 255, .06);
+        --vac: #a1a1aa;
+        --vac-soft: rgba(255, 255, 255, .035);
+        --now: #4ade80;
+        --tint-s: 0%;
+        --tint-l: 100%;
+        --tint-a: .03;
+        --ink-s: 0%;
+        --ink-l: 94%;
+        --dot-s: 35%;
+        --dot-l: 62%;
+        --shadow: 0 1px 2px rgba(0, 0, 0, .4);
+        --shadow-lg: 0 20px 40px -16px rgba(0, 0, 0, .7);
+        color-scheme: dark;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { background: var(--bg); }
+
+    body {
+        font-family: 'Heebo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        padding: 14px 20px 56px;
+        -webkit-font-smoothing: antialiased;
+        position: relative;
+    }
+
+    /* רקע גרדיאנט רך */
+    body::before {
+        content: '';
+        position: fixed;
+        inset: -20vmax;
+        z-index: -1;
+        opacity: var(--blob-o);
+        background:
+            radial-gradient(38vmax 38vmax at 82% 8%, var(--blob-1), transparent 70%),
+            radial-gradient(34vmax 34vmax at 12% 28%, var(--blob-2), transparent 70%),
+            radial-gradient(40vmax 40vmax at 60% 92%, var(--blob-3), transparent 70%);
+        filter: blur(20px);
+        pointer-events: none;
+    }
+
+    h1, h2, h3, .display { font-family: 'Rubik', 'Heebo', sans-serif; }
+    button, input, select, textarea { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+    :focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+    .container { max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+
+    .glass {
+        background: var(--glass);
+        border: 1px solid var(--glass-line);
+        box-shadow: var(--shadow), inset 0 0 0 1px var(--hair);
+        border-radius: var(--r-xl);
+        -webkit-backdrop-filter: blur(22px) saturate(150%);
+        backdrop-filter: blur(22px) saturate(150%);
+    }
+
+    /* ---------- כותרת דביקה ---------- */
+    .topbar {
+        position: sticky;
+        top: 12px;
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+        padding: 10px 12px 10px 16px;
+        border-radius: 22px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; padding-inline-start: 4px; }
+    .logo {
+        width: 42px; height: 42px;
+        border-radius: 13px;
+        background: var(--soft);
+        box-shadow: inset 0 0 0 1px var(--hair);
+        display: grid;
+        place-items: center;
+        font-size: 1.25rem;
+    }
+    .brand h1 { font-size: 1.22rem; font-weight: 800; letter-spacing: -.01em; line-height: 1.15; }
+    .brand p { color: var(--muted); font-size: .8rem; font-weight: 500; }
+
+    .top-actions { display: flex; align-items: center; gap: 8px; }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        height: 40px;
+        padding: 0 16px;
+        border-radius: 12px;
+        border: 1px solid var(--hair);
+        background: var(--glass-strong);
+        font-weight: 600;
+        font-size: .88rem;
+        white-space: nowrap;
+        transition: background .15s, box-shadow .15s, transform .12s, opacity .15s;
+    }
+    .btn:hover:not(:disabled) { box-shadow: 0 0 0 3px var(--primary-soft); }
+    .btn:active:not(:disabled) { transform: scale(.97); }
+    .btn:disabled { opacity: .35; cursor: not-allowed; }
+    .btn-icon { width: 40px; padding: 0; font-size: 1rem; }
+    .btn-primary {
+        background: var(--accent);
+        color: var(--accent-ink);
+        border-color: transparent;
+    }
+    .btn-primary:hover:not(:disabled) { opacity: .88; box-shadow: none; }
+    .btn-ghost { background: transparent; border-color: transparent; }
+    .btn-danger { color: var(--bad); }
+    .btn-danger:hover:not(:disabled) { box-shadow: 0 0 0 3px var(--bad-soft); }
+
+    .week-nav {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        background: var(--soft);
+        border: 1px solid var(--hair);
+        border-radius: 14px;
+        padding: 3px;
+    }
+    .week-nav .btn { height: 34px; width: 34px; border-radius: 10px; background: transparent; border: none; }
+    .week-nav .btn:hover:not(:disabled) { background: var(--glass-strong); box-shadow: var(--shadow); }
+    .week-label { min-width: 128px; text-align: center; line-height: 1.15; padding: 0 6px; }
+    .week-label strong { display: block; font-family: 'Rubik', sans-serif; font-size: .95rem; font-weight: 700; direction: ltr; }
+    .week-label span { font-size: .72rem; color: var(--muted); font-weight: 500; }
+
+    /* ---------- אריחים עליונים (Bento) ---------- */
+    .tiles { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 18px; }
+
+    .tile {
+        padding: 20px 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 0;
+        position: relative;
+        overflow: hidden;
+    }
+    .tile-label {
+        font-size: .76rem;
+        font-weight: 600;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        letter-spacing: .01em;
+    }
+    .tile-main { font-family: 'Rubik', sans-serif; font-size: 1.3rem; font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
+    .tile-sub { font-size: .84rem; color: var(--muted); font-weight: 500; }
+    .big-row { display: flex; align-items: baseline; gap: 10px; }
+    .big { font-family: 'Rubik', sans-serif; font-size: 2.6rem; font-weight: 800; line-height: 1; letter-spacing: -.03em; }
+
+    .hero-bar { height: 4px; border-radius: 99px; background: var(--soft); box-shadow: inset 0 0 0 1px var(--hair); overflow: hidden; margin-top: 8px; }
+    .hero-bar > div { height: 100%; border-radius: 99px; background: var(--text); transition: width .5s; }
+
+    .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--now); animation: pulse 2s infinite; }
+    .live-dot.idle { animation: none; background: var(--muted); opacity: .6; }
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, .5); }
+        70% { box-shadow: 0 0 0 7px rgba(34, 197, 94, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+
+    .tile .big.vac { color: var(--text); }
+    .tile.next-ev { cursor: pointer; transition: transform .15s, box-shadow .15s; }
+    .tile.next-ev:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+    .tile-emoji { position: absolute; inset-inline-end: 18px; top: 16px; font-size: 1.6rem; opacity: .9; }
+
+    /* ---------- סרגל כלים ---------- */
+    .toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+    .field {
+        height: 42px;
+        border: 1px solid var(--glass-line);
+        border-radius: 14px;
+        background: var(--glass);
+        -webkit-backdrop-filter: blur(16px);
+        backdrop-filter: blur(16px);
+        box-shadow: inset 0 0 0 1px var(--hair);
+        padding: 0 14px;
+        font-size: .9rem;
+        outline: none;
+        transition: box-shadow .15s;
+    }
+    .field:focus { box-shadow: inset 0 0 0 1px var(--primary), 0 0 0 4px var(--primary-soft); }
+    .search { width: 240px; }
+
+    .legend { display: flex; gap: 6px; flex-wrap: wrap; font-size: .76rem; font-weight: 600; color: var(--muted); }
+    .legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 11px;
+        border-radius: 99px;
+        background: var(--glass);
+        box-shadow: inset 0 0 0 1px var(--hair);
+    }
+    .legend i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+    /* ---------- טבלת מערכת ---------- */
+    .board { padding: 10px; overflow-x: auto; }
+
+    table.grid { width: 100%; min-width: 940px; border-collapse: separate; border-spacing: 6px; table-layout: fixed; }
+
+    .grid th { padding: 4px 2px 6px; vertical-align: top; text-align: center; font-weight: 600; }
+    .grid th.time-h { width: 86px; }
+
+    .day-pill {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border-radius: 16px;
+        padding: 9px 4px;
+        background: var(--soft);
+        box-shadow: inset 0 0 0 1px var(--hair);
+    }
+    .day-name { font-family: 'Rubik', sans-serif; font-weight: 700; font-size: .98rem; }
+    .day-date { font-size: .74rem; font-weight: 500; color: var(--muted); }
+    th.today .day-pill { background: var(--accent); color: var(--accent-ink); box-shadow: none; }
+    th.today .day-date { color: var(--accent-ink); opacity: .7; }
+
+    .day-events { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+
+    .badge {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        width: 100%;
+        text-align: start;
+        border-radius: 10px;
+        padding: 5px 9px;
+        font-size: .74rem;
+        font-weight: 600;
+        line-height: 1.3;
+        border: none;
+        background: var(--warn-soft);
+        color: var(--warn);
+        transition: transform .12s;
+    }
+    button.badge:hover { transform: translateY(-1px); }
+    .badge .b-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .badge .b-hours { opacity: .7; font-weight: 500; white-space: nowrap; font-size: .7rem; }
+    .badge.school, .badge.t-event { background: var(--info-soft); color: var(--info); }
+    .badge.t-task { background: var(--ok-soft); color: var(--ok); }
+
+    .add-ev {
+        margin-top: 6px;
+        width: 100%;
+        border: 1px dashed color-mix(in srgb, var(--primary) 45%, transparent);
+        color: var(--primary);
+        background: transparent;
+        border-radius: 10px;
+        padding: 4px 6px;
+        font-size: .74rem;
+        font-weight: 600;
+        opacity: .6;
+        transition: opacity .15s, background .15s;
+    }
+    .add-ev:hover { opacity: 1; background: var(--primary-soft); border-style: solid; }
+
+    .grid td { padding: 0; vertical-align: top; height: 88px; border-radius: 16px; }
+    .grid td.today { background: var(--primary-soft); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 18%, transparent); }
+    .grid td.empty-slot { box-shadow: inset 0 0 0 1px var(--hair); }
+    .grid td.today.empty-slot { background: var(--primary-soft); }
+
+    .time-c { text-align: center; vertical-align: middle !important; }
+    .time-c strong { display: block; font-family: 'Rubik', sans-serif; font-weight: 700; font-size: .88rem; }
+    .time-c span { display: block; font-size: .7rem; color: var(--muted); font-weight: 500; direction: ltr; }
+    .time-c.now-row strong { color: var(--now); }
+    .time-c.now-row strong::before { content: '● '; font-size: .7rem; }
+
+    .grid tr.break td { height: 14px; background: none; box-shadow: none; }
+    .grid tr.break td.time-c { font-size: .66rem; font-weight: 600; color: var(--muted); white-space: nowrap; }
+
+    .vac-td { vertical-align: middle !important; }
+    .vac-block {
+        height: 100%;
+        min-height: 220px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border-radius: 18px;
+        background:
+            repeating-linear-gradient(-45deg, transparent 0 10px, color-mix(in srgb, var(--vac) 8%, transparent) 10px 11px),
+            var(--vac-soft);
+        color: var(--vac);
+        font-family: 'Rubik', sans-serif;
+        font-weight: 700;
+        text-align: center;
+        padding: 14px;
+    }
+    .vac-block .emoji { font-size: 2rem; }
+
+    /* ---------- כרטיס שיעור ---------- */
+    .lesson {
+        --h: 240;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        border-radius: 16px;
+        padding: 9px 10px 8px;
+        background: hsl(var(--h) var(--tint-s) var(--tint-l) / var(--tint-a));
+        box-shadow: inset 0 0 0 1px var(--hair), var(--shadow);
+        transition: opacity .2s, filter .2s, box-shadow .2s, transform .15s;
+        position: relative;
+    }
+    .lesson:hover { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text) 25%, transparent), var(--shadow); }
+    .l-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 4px; }
+    .l-name {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: 'Rubik', sans-serif;
+        font-weight: 700;
+        font-size: .88rem;
+        line-height: 1.25;
+        color: hsl(var(--h) var(--ink-s) var(--ink-l));
+    }
+    .l-name::before {
+        content: '';
+        width: 7px; height: 7px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        background: hsl(var(--h) var(--dot-s) var(--dot-l));
+    }
+    .l-note-btn {
+        border: none;
+        background: transparent;
+        opacity: 0;
+        font-size: .78rem;
+        padding: 0 2px;
+        line-height: 1;
+        transition: opacity .15s;
+    }
+    .lesson:hover .l-note-btn, .l-note-btn:focus-visible { opacity: .6; }
+    .l-note-btn:hover { opacity: 1 !important; }
+    @media (hover: none) { .l-note-btn { opacity: .5; } }
+
+    .l-tag {
+        font-size: .68rem;
+        font-weight: 600;
+        border-radius: 7px;
+        padding: 2px 7px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        text-align: start;
+        border: none;
+    }
+    .l-tag.note { background: var(--glass-strong); color: var(--text); }
+    .l-tag.ev { background: var(--warn-soft); color: var(--warn); }
+
+    .l-actions { display: flex; gap: 5px; margin-top: auto; justify-content: flex-end; }
+    .l-act {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: none;
+        background: var(--glass-strong);
+        box-shadow: inset 0 0 0 1px var(--hair);
+        font-size: .78rem;
+        font-weight: 800;
+        color: var(--muted);
+        display: grid;
+        place-items: center;
+        transition: background .15s, color .15s, transform .12s, box-shadow .15s;
+    }
+    .l-act:active { transform: scale(.9); }
+    .l-act.yes:hover { color: var(--ok); box-shadow: inset 0 0 0 1.5px var(--ok); }
+    .l-act.no:hover { color: var(--bad); box-shadow: inset 0 0 0 1.5px var(--bad); }
+    .l-act.yes[aria-pressed="true"] { background: var(--ok); color: var(--glass); box-shadow: none; }
+    .l-act.no[aria-pressed="true"] { background: var(--bad); color: var(--glass); box-shadow: none; }
+
+    .lesson.held { background: var(--ok-soft); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ok) 35%, transparent); }
+    .lesson.held .l-name { color: var(--ok); }
+    .lesson.held .l-name::before { background: var(--ok); }
+    .lesson.canceled { background: var(--bad-soft); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--bad) 35%, transparent); }
+    .lesson.canceled .l-name { color: var(--bad); text-decoration: line-through; }
+    .lesson.canceled .l-name::before { background: var(--bad); }
+
+    .lesson.now { box-shadow: inset 0 0 0 1.5px var(--now); }
+    .lesson.now::after {
+        content: 'עכשיו';
+        position: absolute;
+        top: -8px;
+        inset-inline-end: 10px;
+        font-size: .6rem;
+        font-weight: 700;
+        background: var(--now);
+        color: #fff;
+        padding: 1px 8px;
+        border-radius: 99px;
+    }
+    .lesson.dim { opacity: .16; filter: grayscale(1); }
+    .lesson.match { box-shadow: inset 0 0 0 1.5px var(--text); }
+
+    /* ---------- תצוגת יום (מובייל) ---------- */
+    .dayview { display: none; padding: 6px; }
+    .day-tabs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; margin-bottom: 12px; }
+    .day-tab {
+        border: none;
+        background: var(--soft);
+        box-shadow: inset 0 0 0 1px var(--hair);
+        border-radius: 14px;
+        padding: 8px 0;
+        font-family: 'Rubik', sans-serif;
+        font-weight: 700;
+        font-size: .9rem;
+        line-height: 1.2;
+        position: relative;
+        transition: background .15s;
+    }
+    .day-tab small { display: block; font-family: 'Heebo', sans-serif; font-weight: 500; font-size: .68rem; color: var(--muted); }
+    .day-tab.active { background: var(--accent); color: var(--accent-ink); box-shadow: none; }
+    .day-tab.active small { color: var(--accent-ink); opacity: .7; }
+    .day-tab.is-today:not(.active) { box-shadow: inset 0 0 0 1.5px var(--primary); }
+    .day-tab .dot { position: absolute; top: 6px; inset-inline-start: 7px; width: 6px; height: 6px; border-radius: 50%; background: var(--warn); }
+
+    .dv-events { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+    .dv-list { display: flex; flex-direction: column; gap: 7px; }
+    .dv-row { display: grid; grid-template-columns: 58px 1fr; gap: 8px; align-items: stretch; }
+    .dv-time { text-align: center; font-size: .72rem; color: var(--muted); font-weight: 500; padding-top: 8px; }
+    .dv-time strong { display: block; font-family: 'Rubik', sans-serif; font-size: .86rem; color: var(--text); font-weight: 700; }
+    .dv-row .lesson { min-height: 76px; }
+    .dv-empty { background: var(--soft); border-radius: 16px; min-height: 36px; }
+    .dv-break { text-align: center; font-size: .7rem; font-weight: 600; color: var(--muted); }
+
+    /* ---------- חלק תחתון ---------- */
+    .lower { display: grid; grid-template-columns: minmax(0, 1fr) 370px; gap: 18px; align-items: start; }
+    .side { display: flex; flex-direction: column; gap: 18px; }
+
+    .section { padding: 22px; }
+    .section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+    .section-head h2 { font-size: 1.12rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+
+    .pills { display: flex; gap: 6px; flex-wrap: wrap; }
+    .pill { font-size: .78rem; font-weight: 600; padding: 6px 12px; border-radius: 99px; }
+    .pill strong { font-family: 'Rubik', sans-serif; font-weight: 700; }
+    .pill.ok { background: var(--ok-soft); color: var(--ok); }
+    .pill.bad { background: var(--bad-soft); color: var(--bad); }
+    .pill.muted { background: var(--soft); color: var(--muted); box-shadow: inset 0 0 0 1px var(--hair); }
+
+    .stats-intro { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+    .stats-title { font-size: .95rem; font-weight: 700; }
+    .stats-foot { font-size: .74rem; color: var(--muted); }
+    .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 10px; }
+    .stat {
+        --h: 240;
+        --p: 0;
+        text-align: start;
+        border: none;
+        background: var(--soft);
+        box-shadow: inset 0 0 0 1px var(--hair);
+        border-radius: 18px;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        transition: transform .15s, box-shadow .15s;
+    }
+    .stat:hover { transform: translateY(-1px); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text) 25%, transparent); }
+    .stat.active { box-shadow: inset 0 0 0 1.5px var(--text); }
+    .stat-top { display: flex; align-items: center; gap: 12px; }
+    .ring {
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        position: relative;
+        background: conic-gradient(var(--text) calc(var(--p) * 1%), var(--hair) 0);
+        display: grid;
+        place-items: center;
+    }
+    .ring::before { content: ''; position: absolute; inset: 5px; border-radius: 50%; background: var(--glass-strong); }
+    .ring span { position: relative; font-family: 'Rubik', sans-serif; font-size: .72rem; font-weight: 700; }
+    .stat-name { font-family: 'Rubik', sans-serif; font-weight: 700; font-size: .95rem; }
+    .stat-sub { font-size: .75rem; color: var(--muted); font-weight: 500; }
+    .stat-chips { display: flex; gap: 5px; flex-wrap: wrap; }
+    .chip { font-size: .7rem; font-weight: 600; padding: 3px 8px; border-radius: 99px; background: var(--glass-strong); box-shadow: inset 0 0 0 1px var(--hair); color: var(--muted); }
+    .stat-quota {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: var(--glass-strong);
+        box-shadow: inset 0 0 0 1px var(--hair);
+    }
+    .sq-label { font-size: .74rem; font-weight: 700; color: var(--text); }
+    .sq-calc { font-size: .72rem; font-weight: 500; color: var(--muted); direction: ltr; unicode-bidi: isolate; text-align: right; font-family: 'Rubik', sans-serif; }
+    .sq-num {
+        min-width: 46px;
+        height: 46px;
+        padding: 0 8px;
+        border-radius: 13px;
+        background: var(--accent);
+        color: var(--accent-ink);
+        display: grid;
+        place-items: center;
+        font-family: 'Rubik', sans-serif;
+        font-size: 1.45rem;
+        font-weight: 700;
+    }
+    .chip.bad { background: var(--bad-soft); color: var(--bad); box-shadow: none; }
+
+    .upcoming { display: flex; flex-direction: column; gap: 6px; }
+    .up-item {
+        display: grid;
+        grid-template-columns: 48px 1fr;
+        gap: 12px;
+        align-items: center;
+        text-align: start;
+        border: none;
+        background: var(--soft);
+        box-shadow: inset 0 0 0 1px var(--hair);
+        border-radius: 16px;
+        padding: 8px;
+        transition: transform .15s;
+    }
+    .up-item:hover { transform: translateX(-3px); }
+    .up-date { text-align: center; line-height: 1.05; border-radius: 12px; background: var(--warn-soft); color: var(--warn); padding: 6px 0; }
+    .up-date.t-event { background: var(--info-soft); color: var(--info); }
+    .up-date.t-task { background: var(--ok-soft); color: var(--ok); }
+    .up-date strong { display: block; font-family: 'Rubik', sans-serif; font-size: 1.15rem; font-weight: 800; }
+    .up-date small { font-size: .64rem; font-weight: 600; }
+    .up-title { font-weight: 700; font-size: .88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .up-sub { font-size: .75rem; color: var(--muted); font-weight: 500; }
+    .empty { color: var(--muted); font-size: .85rem; font-weight: 500; padding: 4px 0; line-height: 1.5; }
+
+    .backup p { color: var(--muted); font-size: .85rem; line-height: 1.6; margin-bottom: 12px; }
+    .backup-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: .78rem;
+        font-weight: 600;
+        margin-bottom: 14px;
+        padding: 5px 12px;
+        border-radius: 99px;
+        background: var(--ok-soft);
+        color: var(--ok);
+    }
+    .backup-status i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+    .backup-status.warn { background: var(--warn-soft); color: var(--warn); }
+    .backup-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .backup-btns .btn { height: 46px; border-radius: 14px; }
+    .drop-hint {
+        margin-top: 10px;
+        border: 1.5px dashed var(--hair);
+        border-radius: 14px;
+        padding: 10px;
+        text-align: center;
+        font-size: .76rem;
+        color: var(--muted);
+        font-weight: 500;
+    }
+
+    /* ---------- דיאלוגים ---------- */
+    dialog {
+        margin: auto;
+        border: 1px solid var(--glass-line);
+        border-radius: 26px;
+        background: var(--glass-strong);
+        -webkit-backdrop-filter: blur(24px);
+        backdrop-filter: blur(24px);
+        color: var(--text);
+        width: min(440px, calc(100vw - 32px));
+        padding: 26px;
+        box-shadow: var(--shadow-lg), inset 0 0 0 1px var(--hair);
+    }
+    dialog[open] { animation: pop .22s cubic-bezier(.2, .9, .3, 1.2); }
+    @keyframes pop { from { opacity: 0; transform: translateY(10px) scale(.97); } }
+    dialog::backdrop { background: rgba(8, 10, 20, .45); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+    dialog h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 2px; }
+    dialog .d-sub { color: var(--muted); font-size: .85rem; margin-bottom: 18px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group > label { display: block; font-size: .78rem; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+    .form-group .field { width: 100%; background: var(--soft); -webkit-backdrop-filter: none; backdrop-filter: none; }
+    textarea.field { height: auto; min-height: 100px; padding: 12px 14px; resize: vertical; line-height: 1.5; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .seg-pick { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px; border-radius: 14px; background: var(--soft); box-shadow: inset 0 0 0 1px var(--hair); }
+    .seg-pick label {
+        border-radius: 10px;
+        text-align: center;
+        padding: 8px 0;
+        cursor: pointer;
+        font-size: .86rem;
+        font-weight: 600;
+        color: var(--muted);
+        transition: background .15s, color .15s;
+    }
+    .seg-pick input { position: absolute; opacity: 0; pointer-events: none; }
+    .seg-pick label:has(input:checked) { background: var(--glass-strong); color: var(--text); box-shadow: var(--shadow); }
+    .seg-pick label:has(input:focus-visible) { outline: 2px solid var(--primary); outline-offset: 1px; }
+    .d-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 22px; flex-wrap: wrap; }
+    .d-actions .spacer { flex: 1; }
+
+    .import-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 4px 0 10px; }
+    .import-summary div { background: var(--soft); box-shadow: inset 0 0 0 1px var(--hair); border-radius: 16px; text-align: center; padding: 12px 4px; }
+    .import-summary strong { display: block; font-family: 'Rubik', sans-serif; font-size: 1.5rem; font-weight: 800; }
+    .import-summary span { font-size: .74rem; color: var(--muted); font-weight: 600; }
+    .import-note { font-size: .8rem; color: var(--muted); line-height: 1.6; }
+
+    /* ---------- הודעות וגרירה ---------- */
+    .toast-wrap { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 50; pointer-events: none; }
+    .toast {
+        background: var(--glass-strong);
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
+        color: var(--text);
+        padding: 11px 20px;
+        border-radius: 99px;
+        font-weight: 600;
+        font-size: .88rem;
+        box-shadow: var(--shadow-lg), inset 0 0 0 1px var(--hair);
+        animation: toast-in .3s cubic-bezier(.2, .9, .3, 1.2);
+        white-space: nowrap;
+    }
+    .toast.err { background: var(--bad); color: #fff; }
+    @keyframes toast-in { from { opacity: 0; transform: translateY(14px) scale(.96); } }
+
+    .drop-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 60;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, .25);
+        -webkit-backdrop-filter: blur(6px);
+        backdrop-filter: blur(6px);
+    }
+    .drop-overlay div {
+        background: var(--glass-strong);
+        border: 2px dashed var(--primary);
+        border-radius: 28px;
+        padding: 36px 44px;
+        font-family: 'Rubik', sans-serif;
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: var(--primary);
+    }
+    body.dragging .drop-overlay { display: flex; }
+
+    /* ---------- רספונסיבי ---------- */
+    @media (max-width: 1100px) {
+        .lower { grid-template-columns: 1fr; }
+        .side { display: grid; grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 900px) {
+        .tiles { grid-template-columns: 1fr 1fr; }
+        .tiles .tile:first-child { grid-column: 1 / -1; }
+    }
+    @media (max-width: 760px) {
+        body { padding: 10px 12px 44px; }
+        .container { gap: 14px; }
+        .board table { display: none; }
+        .board { overflow: visible; }
+        .dayview { display: block; }
+        .side { grid-template-columns: 1fr; }
+        .topbar { top: 8px; padding: 10px; }
+        .brand p { display: none; }
+        .logo { width: 36px; height: 36px; font-size: 1.05rem; border-radius: 11px; }
+        .brand h1 { font-size: 1.05rem; }
+        .top-actions { width: 100%; }
+        .week-nav { flex: 1; justify-content: space-between; }
+        .week-label { min-width: 0; }
+        .week-label span { display: none; }
+        .stats { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+        .stat { padding: 12px; }
+        .stat-top { flex-direction: column; align-items: flex-start; gap: 8px; }
+        .search { width: 100%; }
+        .filters { width: 100%; display: grid; grid-template-columns: 1fr 1fr; }
+        .legend { display: none; }
+        .tiles { gap: 12px; }
+        .tile { padding: 16px 18px; }
+        .big { font-size: 2.2rem; }
+        .section { padding: 16px; }    }
+    @media (max-width: 420px) {
+        .tiles { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+    @media print {
+        body { padding: 0; background: #fff; }
+        body::before { display: none; }
+        .tiles, .toolbar, .lower, .top-actions, .add-ev, .l-actions, .l-note-btn { display: none !important; }
+        .topbar { position: static; }
+    }
+</style>
 </head>
 <body>
 
 <div class="container">
-    <header>
-        <div class="header-title-area">
-            <h1>מערכת שעות שבועית</h1>
-            <div class="live-tracker-pill">
-                <div class="live-dot"></div>
-                <span id="liveTrackerText">בודק שיעור פעיל...</span>
-            </div>
-            <div class="holiday-countdown-pill" id="holidayCountdownText">
-                🎉 מחשב חופשה קרובה...
-            </div>
-            <div class="legend">
-                <div class="legend-item"><div class="legend-dot" style="background: var(--vacation-border);"></div>חופשה</div>
-                <div class="legend-item"><div class="legend-dot" style="background: var(--school-event-border);"></div>אירוע ביה"ס</div>
-                <div class="legend-item"><div class="legend-dot" style="background: var(--event-border);"></div>מבחן/אירוע אישי</div>
-                <div class="legend-item"><div class="legend-dot" style="background: var(--success-border);"></div>התקיים</div>
-                <div class="legend-item"><div class="legend-dot" style="background: var(--danger-border);"></div>בוטל</div>
+    <header class="glass topbar">
+        <div class="brand">
+            <div class="logo">📅</div>
+            <div>
+                <h1>מערכת שעות</h1>
+                <p id="todayLabel"></p>
             </div>
         </div>
-
-        <div class="controls-bar">
-            <div class="tool-group">
-                <label for="searchInput">🔍 חיפוש:</label>
-                <input type="text" id="searchInput" class="input-select search-input" placeholder="חפש מקצוע..." oninput="handleSearch(this.value)">
+        <div class="top-actions">
+            <div class="week-nav">
+                <button class="btn btn-icon" id="prevWeek" title="שבוע קודם" aria-label="שבוע קודם">→</button>
+                <div class="week-label"><strong id="weekRange"></strong><span id="weekMeta"></span></div>
+                <button class="btn btn-icon" id="nextWeek" title="שבוע הבא" aria-label="שבוע הבא">←</button>
             </div>
-
-            <div class="tool-group">
-                <label for="subjectFilter">סינון:</label>
-                <select id="subjectFilter" class="input-select" onchange="highlightSubject(this.value)">
-                    <option value="">הצג הכל</option>
-                </select>
-            </div>
-
-            <button class="btn" id="prevWeekBtn" onclick="changeWeek(-1)">◀</button>
-            <span class="week-range" id="weekDisplay">--/-- - --/--</span>
-            <button class="btn" onclick="goToCurrentWeek()">השבוע</button>
-            <button class="btn" onclick="changeWeek(1)">▶</button>
-
-            <button class="btn" onclick="toggleDarkMode()" title="מצב לילה/יום">🌙</button>
+            <button class="btn" id="thisWeek">השבוע</button>
+            <button class="btn btn-icon" id="themeBtn" title="מצב יום/לילה" aria-label="מצב יום/לילה">🌙</button>
         </div>
     </header>
 
-    <div class="day-progress-container">
-        <span class="day-progress-text" id="dayProgressText">התקדמות יום הלימודים: 0%</span>
-        <div class="day-progress-bar-bg">
-            <div class="day-progress-bar-fill" id="dayProgressBarFill"></div>
+    <section class="tiles">
+        <div class="glass tile hero" id="liveTile">
+            <div class="tile-label"><span class="live-dot" id="liveDot"></span><span id="liveLabel">עכשיו</span></div>
+            <div class="tile-main" id="liveMain"></div>
+            <div class="tile-sub" id="liveSub"></div>
+            <div class="hero-bar"><div id="dayBar" style="width:0%"></div></div>
+        </div>
+        <div class="glass tile">
+            <span class="tile-emoji">🏖️</span>
+            <div class="tile-label">החופשה הבאה</div>
+            <div class="big-row" id="holidayMain"></div>
+            <div class="tile-sub" id="holidaySub"></div>
+        </div>
+        <div class="glass tile next-ev" id="nextEvTile" role="button" tabindex="0">
+            <span class="tile-emoji">🎯</span>
+            <div class="tile-label">האירוע הקרוב</div>
+            <div class="tile-main" id="nextEvMain"></div>
+            <div class="tile-sub" id="nextEvSub"></div>
+        </div>
+    </section>
+
+    <div class="toolbar">
+        <div class="filters">
+            <input type="search" id="search" class="field search" placeholder="🔍 חיפוש מקצוע או הערה..." autocomplete="off">
+            <select id="subjectFilter" class="field" aria-label="סינון לפי מקצוע"></select>
+        </div>
+        <div class="legend">
+            <span><i style="background:var(--vac)"></i>חופשה</span>
+            <span><i style="background:var(--info)"></i>אירוע ביה"ס</span>
+            <span><i style="background:var(--warn)"></i>מבחן</span>
+            <span><i style="background:var(--ok)"></i>התקיים</span>
+            <span><i style="background:var(--bad)"></i>בוטל</span>
         </div>
     </div>
 
-    <div class="grid-wrapper">
-        <table class="schedule-grid">
-            <thead>
-                <tr>
-                    <th style="width: 95px;">שעה</th>
-                    <th id="th-0">ראשון <span class="date-sub" id="date-0"></span></th>
-                    <th id="th-1">שני <span class="date-sub" id="date-1"></span></th>
-                    <th id="th-2">שלישי <span class="date-sub" id="date-2"></span></th>
-                    <th id="th-3">רביעי <span class="date-sub" id="date-3"></span></th>
-                    <th id="th-4">חמישי <span class="date-sub" id="date-4"></span></th>
-                    <th id="th-5">שישי <span class="date-sub" id="date-5"></span></th>
-                </tr>
-            </thead>
-            <tbody id="scheduleBody"></tbody>
+    <main class="glass board" id="board">
+        <table class="grid">
+            <thead><tr id="gridHead"></tr></thead>
+            <tbody id="gridBody"></tbody>
         </table>
-    </div>
+        <div class="dayview">
+            <div class="day-tabs" id="dayTabs"></div>
+            <div class="dv-events" id="dvEvents"></div>
+            <div class="dv-list" id="dvList"></div>
+        </div>
+    </main>
 
-    <div class="bottom-section">
-        <div class="box-header">
-            <h2>📊 סיכום נוכחות מצטבר</h2>
-            <div class="stats-summary-pills">
-                <div class="summary-pill success">
-                    <span>התקיימו:</span>
-                    <strong id="totalHeld">0</strong>
-                </div>
-                <div class="summary-pill danger">
-                    <span>בוטלו:</span>
-                    <strong id="totalCanceled">0</strong>
+    <div class="lower">
+        <section class="glass section">
+            <div class="section-head">
+                <h2>📊 סיכום שיעורים</h2>
+                <div class="pills">
+                    <span class="pill ok">התקיימו עד עכשיו: <strong id="totalHeld">0</strong></span>
+                    <span class="pill bad">בוטלו: <strong id="totalNo">0</strong></span>
+                    <span class="pill muted">סימנת ✓: <strong id="totalYes">0</strong></span>
                 </div>
             </div>
-        </div>
 
-        <div class="stats-grid" id="statsGrid"></div>
-
-        <div class="backup-bar">
-            <span>💾 הנתונים שמורים בדפדפן שלך</span>
-            <div class="backup-actions">
-                <button class="btn" onclick="exportData()">ייצוא גיבוי (JSON)</button>
-                <button class="btn" onclick="document.getElementById('importFileInput').click()">שחזור מגיבוי</button>
-                <input type="file" id="importFileInput" style="display:none;" accept=".json" onchange="importData(event)">
+            <div class="stats-intro">
+                <h3 class="stats-title">15% לפי מקצוע</h3>
+                <span class="stats-foot" id="quotaFoot"></span>
             </div>
-        </div>
+            <div class="stats" id="stats"></div>
+        </section>
+
+        <aside class="side">
+            <section class="glass section">
+                <div class="section-head"><h2>🗓️ מבחנים ואירועים קרובים</h2></div>
+                <div class="upcoming" id="upcoming"></div>
+            </section>
+
+            <section class="glass section backup">
+                <div class="section-head"><h2>💾 גיבוי ושחזור</h2></div>
+                <p>כל הסימונים, ההערות והמבחנים נשמרים בדפדפן הזה. הורד קובץ JSON כדי לשמור עותק, ולהחזיר אותו בכל מכשיר או דפדפן אחר.</p>
+                <div class="backup-status" id="backupStatus"><i></i><span></span></div>
+                <div class="backup-btns">
+                    <button class="btn btn-primary" id="exportBtn">⬇️ הורדת גיבוי</button>
+                    <button class="btn" id="importBtn">⬆️ שחזור מקובץ</button>
+                </div>
+                <input type="file" id="fileInput" accept=".json,application/json" hidden>
+                <div class="drop-hint">אפשר גם לגרור קובץ JSON לכל מקום בעמוד</div>
+            </section>
+        </aside>
     </div>
 </div>
 
-<div class="modal-overlay" id="eventModal">
-    <div class="modal">
-        <h3 id="modalTitle">הוספת אירוע / מבחן</h3>
+<!-- דיאלוג אירוע / מבחן -->
+<dialog id="eventDialog">
+    <form method="dialog" id="eventForm">
+        <h3 id="evTitle">אירוע חדש</h3>
+        <div class="d-sub" id="evSub"></div>
         <div class="form-group">
-            <label for="eventTitleInput">תיאור האירוע / שם המבחן:</label>
-            <input type="text" id="eventTitleInput" class="form-control" placeholder="לדוגמה: מבחן במתמטיקה">
+            <label for="evName">תיאור</label>
+            <input id="evName" class="field" required maxlength="80" placeholder="לדוגמה: מבחן במתמטיקה" autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label>סוג</label>
+            <div class="seg-pick">
+                <label><input type="radio" name="evType" value="test" checked><span>📝 מבחן</span></label>
+                <label><input type="radio" name="evType" value="task"><span>📎 הגשה</span></label>
+                <label><input type="radio" name="evType" value="event"><span>📌 אירוע</span></label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="evDate">תאריך</label>
+            <input id="evDate" type="date" class="field" required>
         </div>
         <div class="form-row">
-            <div class="form-group">
-                <label for="startHourSelect">משעה:</label>
-                <select id="startHourSelect" class="form-control"></select>
-            </div>
-            <div class="form-group">
-                <label for="endHourSelect">עד שעה:</label>
-                <select id="endHourSelect" class="form-control"></select>
-            </div>
+            <div class="form-group"><label for="evStart">משעה</label><select id="evStart" class="field"></select></div>
+            <div class="form-group"><label for="evEnd">עד שעה</label><select id="evEnd" class="field"></select></div>
         </div>
-        <div class="modal-actions">
-            <button class="btn" onclick="closeEventModal()">ביטול</button>
-            <button class="btn btn-primary" onclick="saveEvent()">שמור אירוע</button>
+        <div class="d-actions">
+            <button type="button" class="btn btn-danger" id="evDelete">מחיקה</button>
+            <span class="spacer"></span>
+            <button type="button" class="btn btn-ghost" data-close>ביטול</button>
+            <button type="submit" class="btn btn-primary">שמירה</button>
         </div>
+    </form>
+</dialog>
+
+<!-- דיאלוג הערה -->
+<dialog id="noteDialog">
+    <form method="dialog" id="noteForm">
+        <h3 id="noteTitle">הערה לשיעור</h3>
+        <div class="d-sub" id="noteSub"></div>
+        <div class="form-group">
+            <textarea id="noteText" class="field" maxlength="300" placeholder="לדוגמה: להביא מחשבון, שיעורי בית עמ' 42"></textarea>
+        </div>
+        <div class="d-actions">
+            <button type="button" class="btn btn-danger" id="noteDelete">מחיקת הערה</button>
+            <span class="spacer"></span>
+            <button type="button" class="btn btn-ghost" data-close>ביטול</button>
+            <button type="submit" class="btn btn-primary">שמירה</button>
+        </div>
+    </form>
+</dialog>
+
+<!-- דיאלוג שחזור -->
+<dialog id="importDialog">
+    <h3>שחזור מקובץ גיבוי</h3>
+    <div class="d-sub" id="importFile"></div>
+    <div class="import-summary">
+        <div><strong id="impAtt">0</strong><span>סימוני נוכחות</span></div>
+        <div><strong id="impEv">0</strong><span>מבחנים ואירועים</span></div>
+        <div><strong id="impNotes">0</strong><span>הערות</span></div>
     </div>
-</div>
+    <p class="import-note"><b>מיזוג</b> מוסיף את מה שבקובץ לנתונים הקיימים. <b>החלפה</b> מוחקת את הנתונים שבדפדפן ושמה במקומם את הקובץ.</p>
+    <div class="d-actions">
+        <button type="button" class="btn btn-ghost" data-close>ביטול</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn" id="impReplace">החלפה</button>
+        <button type="button" class="btn btn-primary" id="impMerge">מיזוג</button>
+    </div>
+</dialog>
+
+<div class="drop-overlay"><div>⬆️ שחרר כאן כדי לשחזר גיבוי</div></div>
+<div class="toast-wrap" id="toasts"></div>
 
 <script>
-    const START_DATE = new Date('2026-09-01');
-    START_DATE.setHours(0, 0, 0, 0);
+    /* ===================== הגדרות שנת הלימודים ===================== */
 
-    const dayNames = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי"];
+    const SCHOOL_START = '2026-09-01';
+    const SCHOOL_END = '2027-06-20';
+    const QUOTA_PERCENT = 15;
 
-    const holidays = [
-        { name: "ראש השנה", start: "2026-09-11", end: "2026-09-13" },
-        { name: "יום כיפור", start: "2026-09-20", end: "2026-09-21" },
-        { name: "גשר כיפור-סוכות", start: "2026-09-22", end: "2026-09-24" },
-        { name: "סוכות", start: "2026-09-25", end: "2026-10-03" },
-        { name: "חנוכה", start: "2026-12-06", end: "2026-12-12" },
-        { name: "פורים", start: "2027-03-23", end: "2027-03-24" },
-        { name: "פסח", start: "2027-04-13", end: "2027-04-28" },
-        { name: "יום העצמאות", start: "2027-05-12", end: "2027-05-12" },
-        { name: "שבועות", start: "2027-06-10", end: "2027-06-11" }
+    const DAY_NAMES = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי'];
+    const DAY_LETTERS = ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳'];
+
+    const HOLIDAYS = [
+        { name: 'ראש השנה', start: '2026-09-11', end: '2026-09-13' },
+        { name: 'יום כיפור', start: '2026-09-20', end: '2026-09-21' },
+        { name: 'גשר כיפור-סוכות', start: '2026-09-22', end: '2026-09-24' },
+        { name: 'סוכות', start: '2026-09-25', end: '2026-10-03' },
+        { name: 'חנוכה', start: '2026-12-06', end: '2026-12-12' },
+        { name: 'פורים', start: '2027-03-23', end: '2027-03-24' },
+        { name: 'פסח', start: '2027-04-13', end: '2027-04-28' },
+        { name: 'יום העצמאות', start: '2027-05-12', end: '2027-05-12' },
+        { name: 'שבועות', start: '2027-06-10', end: '2027-06-11' }
     ];
 
-    const schoolEvents = {
-        "2026-11-09": "חג הסיגד (יום לימודים)",
-        "2027-03-22": "תענית אסתר (יום לימודים)",
-        "2027-04-29": "אסרו חג פסח (יום לימודים)",
-        "2027-05-25": "ל\"ג בעומר (יום לימודים)",
-        "2027-06-04": "יום ירושלים (יום לימודים)"
+    const SCHOOL_EVENTS = {
+        '2026-11-09': 'חג הסיגד (יום לימודים)',
+        '2027-03-22': 'תענית אסתר (יום לימודים)',
+        '2027-04-29': 'אסרו חג פסח (יום לימודים)',
+        '2027-05-25': 'ל"ג בעומר (יום לימודים)',
+        '2027-06-04': 'יום ירושלים (יום לימודים)'
     };
 
-    const hoursConfig = [
-        { id: 0, time: "07:45 - 08:25", start: "07:45", end: "08:25" },
-        { id: 1, time: "08:30 - 09:15", start: "08:30", end: "09:15" },
-        { id: 2, time: "09:15 - 10:00", start: "09:15", end: "10:00" },
-        { id: 3, time: "10:15 - 11:00", start: "10:15", end: "11:00" },
-        { id: 4, time: "11:00 - 11:45", start: "11:00", end: "11:45" },
-        { id: 5, time: "12:00 - 12:45", start: "12:00", end: "12:45" },
-        { id: 6, time: "12:45 - 13:30", start: "12:45", end: "13:30" },
-        { id: 7, time: "13:55 - 14:40", start: "13:55", end: "14:40" },
-        { id: 8, time: "14:40 - 15:25", start: "14:40", end: "15:25" },
-        { id: 9, time: "15:30 - 16:15", start: "15:30", end: "16:15" },
-        { id: 10, time: "16:15 - 17:00", start: "16:15", end: "17:00" }
+    const HOURS = [
+        { id: 0, start: '07:45', end: '08:25' },
+        { id: 1, start: '08:30', end: '09:15' },
+        { id: 2, start: '09:15', end: '10:00' },
+        { id: 3, start: '10:15', end: '11:00' },
+        { id: 4, start: '11:00', end: '11:45' },
+        { id: 5, start: '12:00', end: '12:45' },
+        { id: 6, start: '12:45', end: '13:30' },
+        { id: 7, start: '13:55', end: '14:40' },
+        { id: 8, start: '14:40', end: '15:25' },
+        { id: 9, start: '15:30', end: '16:15' },
+        { id: 10, start: '16:15', end: '17:00' }
     ];
 
-    const schedule = {
-        0: { 3: "אזרחות", 4: "לשון", 5: "אנגלית", 6: "אנגלית", 7: "אנגלית", 8: "מדעי המחשב", 9: "מדעי המחשב" },
-        1: { 1: "מתמטיקה", 2: "מתמטיקה", 3: "מתמטיקה", 4: "לשון", 5: "תנ'ך", 6: "תנ'ך", 7: "חינוך גופני", 8: "פיזיקה", 9: "פיזיקה", 10: "פיזיקה" },
-        2: { 1: "פיזיקה", 2: "פיזיקה", 3: "פיזיקה", 4: "מדעי המחשב", 5: "מדעי המחשב", 6: "מדעי המחשב", 7: "ספרות", 8: "ספרות" },
-        3: { 2: "אנגלית", 3: "היסטוריה", 4: "חינוך גופני", 5: "לשון", 6: "לשון", 7: "מתמטיקה", 8: "מתמטיקה", 9: "היסטוריה" },
-        4: { 0: "ספרות", 1: "ספרות", 2: "אזרחות", 3: "אנגלית", 4: "פיזיקה", 5: "פיזיקה", 6: "פיזיקה", 7: "חינוך", 8: "היסטוריה", 9: "היסטוריה" },
-        5: { 4: "מתמטיקה", 5: "מתמטיקה", 6: "מתמטיקה" }
+    const SCHEDULE = {
+        0: { 3: 'אזרחות', 4: 'לשון', 5: 'אנגלית', 6: 'אנגלית', 7: 'אנגלית', 8: 'מדעי המחשב', 9: 'מדעי המחשב' },
+        1: { 1: 'מתמטיקה', 2: 'מתמטיקה', 3: 'מתמטיקה', 4: 'לשון', 5: "תנ'ך", 6: "תנ'ך", 7: 'חינוך גופני', 8: 'פיזיקה', 9: 'פיזיקה', 10: 'פיזיקה' },
+        2: { 1: 'פיזיקה', 2: 'פיזיקה', 3: 'פיזיקה', 4: 'מדעי המחשב', 5: 'מדעי המחשב', 6: 'מדעי המחשב', 7: 'ספרות', 8: 'ספרות' },
+        3: { 2: 'אנגלית', 3: 'היסטוריה', 4: 'חינוך גופני', 5: 'לשון', 6: 'לשון', 7: 'מתמטיקה', 8: 'מתמטיקה', 9: 'היסטוריה' },
+        4: { 0: 'ספרות', 1: 'ספרות', 2: 'אזרחות', 3: 'אנגלית', 4: 'פיזיקה', 5: 'פיזיקה', 6: 'פיזיקה', 7: 'חינוך', 8: 'היסטוריה', 9: 'היסטוריה' },
+        5: { 4: 'מתמטיקה', 5: 'מתמטיקה', 6: 'מתמטיקה' }
     };
 
-    let minSunday = getSunday(START_DATE);
-    let currentSundayDate = getSunday(new Date() < START_DATE ? START_DATE : new Date());
-    
-    let attendanceData = JSON.parse(localStorage.getItem('myWeeklyAttendance')) || {};
-    let eventsData = JSON.parse(localStorage.getItem('myWeeklyEvents')) || {};
-    let notesData = JSON.parse(localStorage.getItem('myWeeklyNotes')) || {};
-    let isDarkMode = localStorage.getItem('myWeeklyDarkMode') === 'true';
+    // אותם מפתחות כמו בגרסה הקודמת, כך שהנתונים הקיימים נטענים אוטומטית
+    const KEYS = {
+        attendance: 'myWeeklyAttendance',
+        events: 'myWeeklyEvents',
+        notes: 'myWeeklyNotes',
+        dark: 'myWeeklyDarkMode',
+        lastBackup: 'myWeeklyLastBackup'
+    };
 
-    let selectedFilterSubject = "";
-    let searchQuery = "";
-    let activeModalDateStr = null;
+    const EVENT_TYPES = {
+        test: { label: 'מבחן', icon: '📝' },
+        task: { label: 'הגשה', icon: '📎' },
+        event: { label: 'אירוע', icon: '📌' }
+    };
 
-    if (isDarkMode) document.body.classList.add('dark-theme');
+    /* ===================== עזרים ===================== */
 
-    function toggleDarkMode() {
-        document.body.classList.toggle('dark-theme');
-        localStorage.setItem('myWeeklyDarkMode', document.body.classList.contains('dark-theme'));
+    const $ = id => document.getElementById(id);
+    const pad = n => String(n).padStart(2, '0');
+    const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    const parseYmd = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+    const dm = d => `${pad(d.getDate())}/${pad(d.getMonth() + 1)}`;
+    const toMin = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+    const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+    const sundayOf = d => { const x = new Date(d); x.setHours(0, 0, 0, 0); x.setDate(x.getDate() - x.getDay()); return x; };
+    const dayDiff = (a, b) => Math.round((parseYmd(ymd(b)) - parseYmd(ymd(a))) / 86400000);
+    const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const hourLabel = h => `${HOURS[h].start}–${HOURS[h].end}`;
+    const hoursRange = (a, b) => a === b ? `שעה ${a}` : `שעות ${a}–${b}`;
+    // 15% מעוגל כלפי מטה, בחשבון של מספרים שלמים כדי להימנע משגיאות עיגול
+    const quotaOf = n => Math.floor(n * QUOTA_PERCENT / 100);
+
+    function load(key) {
+        try {
+            const v = JSON.parse(localStorage.getItem(key));
+            return v && typeof v === 'object' && !Array.isArray(v) ? v : {};
+        } catch { return {}; }
+    }
+    function store(key, value) {
+        try { localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value)); } catch { }
     }
 
-    function getSunday(d) {
-        const date = new Date(d);
-        date.setHours(0, 0, 0, 0);
-        const day = date.getDay();
-        return new Date(date.setDate(date.getDate() - day));
+    function daysWord(n) {
+        if (n === 0) return 'היום';
+        if (n === 1) return 'מחר';
+        if (n === 2) return 'מחרתיים';
+        return `בעוד ${n} ימים`;
     }
 
-    function formatDate(date) {
-        const d = new Date(date);
-        return [d.getFullYear(), (d.getMonth() + 1).toString().padStart(2, '0'), d.getDate().toString().padStart(2, '0')].join('-');
-    }
+    /* ===================== מקצועות וצבעים ===================== */
 
-    function formatDisplayDate(date) {
-        const d = new Date(date);
-        return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}`;
+    const SUBJECTS = [];
+    for (let d = 0; d < 6; d++) {
+        Object.keys(SCHEDULE[d] || {}).sort((a, b) => a - b).forEach(h => {
+            const s = SCHEDULE[d][h];
+            if (!SUBJECTS.includes(s)) SUBJECTS.push(s);
+        });
     }
+    const HUE = {};
+    SUBJECTS.forEach((s, i) => { HUE[s] = Math.round((235 + i * 137.508) % 360); });
 
-    function getHolidayName(dateStr) {
-        for (let h of holidays) {
-            if (dateStr >= h.start && dateStr <= h.end) return h.name;
-        }
+    /* ===================== מצב ===================== */
+
+    const state = {
+        attendance: load(KEYS.attendance),
+        events: load(KEYS.events),
+        notes: load(KEYS.notes),
+        week: null,
+        filter: '',
+        search: '',
+        mobileDay: null,
+        editing: null,
+        noteKey: null,
+        pendingImport: null
+    };
+
+    const MIN_SUNDAY = sundayOf(parseYmd(SCHOOL_START));
+    const MAX_SUNDAY = sundayOf(parseYmd(SCHOOL_END));
+
+    function defaultWeek() {
+        const today = new Date();
+        let s = sundayOf(today);
+        if (today.getDay() === 6) s = addDays(s, 7); // בשבת מציגים את השבוע הבא
+        if (s < MIN_SUNDAY) s = MIN_SUNDAY;
+        if (s > MAX_SUNDAY) s = MAX_SUNDAY;
+        return s;
+    }
+    state.week = defaultWeek();
+
+    /* ===================== לוגיקת ימים ===================== */
+
+    // מחזיר שם חופשה אם אין לימודים בתאריך הזה, אחרת null
+    function offReason(dateStr) {
+        if (dateStr < SCHOOL_START) return 'חופש הגדול';
+        if (dateStr > SCHOOL_END) return 'חופש הגדול';
+        for (const h of HOLIDAYS) if (dateStr >= h.start && dateStr <= h.end) return h.name;
         return null;
     }
 
-    function initFilterDropdown() {
-        const select = document.getElementById('subjectFilter');
-        const subjects = new Set();
-        for (let day in schedule) {
-            for (let hour in schedule[day]) subjects.add(schedule[day][hour]);
+    function subjectAt(dateStr, hour) {
+        const dow = parseYmd(dateStr).getDay();
+        return SCHEDULE[dow] ? SCHEDULE[dow][hour] || null : null;
+    }
+
+    function eventsOn(dateStr) {
+        return (state.events[dateStr] || []).map((e, i) => ({ ...e, idx: i, date: dateStr }));
+    }
+
+    function eventsAt(dateStr, hour) {
+        return eventsOn(dateStr).filter(e => hour >= e.startHour && hour <= e.endHour);
+    }
+
+    const evType = e => EVENT_TYPES[e.type] ? e.type : 'test';
+
+    function matches(subject, dateStr, hour) {
+        if (state.filter && subject !== state.filter) return false;
+        if (state.search) {
+            const q = state.search;
+            const note = (state.notes[`${dateStr}_${hour}`] || '').toLowerCase();
+            const evs = eventsAt(dateStr, hour).map(e => e.title.toLowerCase()).join(' ');
+            if (!subject.toLowerCase().includes(q) && !note.includes(q) && !evs.includes(q)) return false;
         }
-        select.innerHTML = '<option value="">הצג הכל</option>';
-        subjects.forEach(sub => {
-            const opt = document.createElement('option');
-            opt.value = sub;
-            opt.textContent = sub;
-            select.appendChild(opt);
-        });
+        return true;
     }
 
-    function highlightSubject(subName) {
-        selectedFilterSubject = subName;
-        renderBoard();
-    }
-
-    function handleSearch(val) {
-        searchQuery = val.trim().toLowerCase();
-        renderBoard();
-    }
-
-    function changeWeek(direction) {
-        const target = new Date(currentSundayDate);
-        target.setDate(target.getDate() + (direction * 7));
-        if (target < minSunday) return;
-        currentSundayDate = target;
-        renderBoard();
-    }
-
-    function goToCurrentWeek() {
-        currentSundayDate = getSunday(new Date() < START_DATE ? START_DATE : new Date());
-        renderBoard();
-    }
-
-    function toggleStatus(dateStr, hourId, status) {
-        const key = `${dateStr}_${hourId}`;
-        if (attendanceData[key] === status) delete attendanceData[key];
-        else attendanceData[key] = status;
-        localStorage.setItem('myWeeklyAttendance', JSON.stringify(attendanceData));
-        renderBoard();
-    }
-
-    function addNote(dateStr, hourId) {
-        const key = `${dateStr}_${hourId}`;
-        const currentNote = notesData[key] || '';
-        const newNote = prompt('הכנס הערה קצרה לשיעור זה:', currentNote);
-        if (newNote !== null) {
-            if (newNote.trim() === '') delete notesData[key];
-            else notesData[key] = newNote.trim();
-            localStorage.setItem('myWeeklyNotes', JSON.stringify(notesData));
-            renderBoard();
+    // שורות הטבלה: שעות + הפסקות של 15 דקות ומעלה
+    const ROWS = [];
+    HOURS.forEach((h, i) => {
+        if (i > 0) {
+            const gap = toMin(h.start) - toMin(HOURS[i - 1].end);
+            if (gap >= 15) ROWS.push({ type: 'break', min: gap, from: HOURS[i - 1].end, to: h.start });
         }
+        ROWS.push({ type: 'hour', h: h.id });
+    });
+
+    function currentHour(now) {
+        const m = now.getHours() * 60 + now.getMinutes();
+        const h = HOURS.find(x => m >= toMin(x.start) && m < toMin(x.end));
+        return h ? h.id : null;
     }
 
-    function openEventModal(dateStr, dayName) {
-        activeModalDateStr = dateStr;
-        document.getElementById('modalTitle').innerText = `הוספת אירוע / מבחן ליום ${dayName}`;
-        document.getElementById('eventTitleInput').value = '';
-        document.getElementById('eventModal').classList.add('active');
+    /* ===================== רינדור: כרטיס שיעור ===================== */
+
+    function lessonHTML(dateStr, hour, subject, isNow) {
+        const key = `${dateStr}_${hour}`;
+        const status = state.attendance[key];
+        const note = state.notes[key];
+        const evs = eventsAt(dateStr, hour);
+        const filtering = state.filter || state.search;
+        const ok = matches(subject, dateStr, hour);
+
+        let cls = 'lesson';
+        if (status === 'yes') cls += ' held';
+        if (status === 'no') cls += ' canceled';
+        if (isNow) cls += ' now';
+        if (filtering) cls += ok ? ' match' : ' dim';
+
+        const evTags = evs.map(e =>
+            `<button class="l-tag ev" data-act="edit-event" data-date="${dateStr}" data-idx="${e.idx}" title="${esc(e.title)}">${EVENT_TYPES[evType(e)].icon} ${esc(e.title)}</button>`
+        ).join('');
+        const noteTag = note ? `<button class="l-tag note" data-act="note" data-key="${key}" title="${esc(note)}">📌 ${esc(note)}</button>` : '';
+
+        return `
+            <div class="${cls}" style="--h:${HUE[subject]}">
+                <div class="l-top">
+                    <span class="l-name">${esc(subject)}</span>
+                    <button class="l-note-btn" data-act="note" data-key="${key}" title="${note ? 'עריכת הערה' : 'הוספת הערה'}" aria-label="הערה">✏️</button>
+                </div>
+                ${evTags}${noteTag}
+                <div class="l-actions">
+                    <button class="l-act yes" data-act="status" data-key="${key}" data-val="yes" aria-pressed="${status === 'yes'}" title="השיעור התקיים">✓</button>
+                    <button class="l-act no" data-act="status" data-key="${key}" data-val="no" aria-pressed="${status === 'no'}" title="השיעור בוטל">✕</button>
+                </div>
+            </div>`;
     }
 
-    function closeEventModal() {
-        document.getElementById('eventModal').classList.remove('active');
+    function dayEventsHTML(dateStr) {
+        let html = '';
+        if (SCHOOL_EVENTS[dateStr]) html += `<div class="badge school"><span class="b-text">🎉 ${esc(SCHOOL_EVENTS[dateStr])}</span></div>`;
+        html += eventsOn(dateStr).map(e => {
+            const t = evType(e);
+            return `<button class="badge t-${t}" data-act="edit-event" data-date="${dateStr}" data-idx="${e.idx}" title="${esc(e.title)}">
+                <span class="b-text">${EVENT_TYPES[t].icon} ${esc(e.title)}</span>
+                <span class="b-hours">${e.startHour === e.endHour ? e.startHour : `${e.startHour}–${e.endHour}`}</span>
+            </button>`;
+        }).join('');
+        return html;
     }
 
-    function saveEvent() {
-        const title = document.getElementById('eventTitleInput').value.trim();
-        const startHour = parseInt(document.getElementById('startHourSelect').value);
-        const endHour = parseInt(document.getElementById('endHourSelect').value);
+    /* ===================== רינדור: טבלה שבועית ===================== */
 
-        if (!title || endHour < startHour) return;
-
-        if (!eventsData[activeModalDateStr]) eventsData[activeModalDateStr] = [];
-        eventsData[activeModalDateStr].push({ title, startHour, endHour });
-
-        localStorage.setItem('myWeeklyEvents', JSON.stringify(eventsData));
-        closeEventModal();
-        renderBoard();
+    function weekDates() {
+        return Array.from({ length: 6 }, (_, i) => addDays(state.week, i));
     }
 
-    function removeEvent(dateStr, index) {
-        eventsData[dateStr].splice(index, 1);
-        if (!eventsData[dateStr].length) delete eventsData[dateStr];
-        localStorage.setItem('myWeeklyEvents', JSON.stringify(eventsData));
-        renderBoard();
+    function renderWeekNav() {
+        const dates = weekDates();
+        $('weekRange').textContent = `${dm(dates[0])} – ${dm(dates[5])}`;
+        const n = Math.round((state.week - MIN_SUNDAY) / (7 * 86400000)) + 1;
+        const cur = sundayOf(new Date()).getTime() === state.week.getTime();
+        $('weekMeta').textContent = cur ? `שבוע ${n} · השבוע הנוכחי` : `שבוע ${n} בשנה`;
+        $('prevWeek').disabled = state.week <= MIN_SUNDAY;
+        $('nextWeek').disabled = state.week >= MAX_SUNDAY;
     }
 
-    /* עדכון מעקב בזמן אמת + התקדמות יומית */
-    function updateLiveTracker() {
+    function renderGrid() {
+        const dates = weekDates();
         const now = new Date();
-        const dayIdx = now.getDay();
-        const currentTimeStr = now.toTimeString().substring(0, 5);
-        const trackerElement = document.getElementById('liveTrackerText');
+        const todayStr = ymd(now);
+        const nowHour = currentHour(now);
 
-        if (dayIdx > 5) {
-            trackerElement.innerText = "שבת שלום! אין לימודים היום";
-            updateDayProgress(100, "סוף שבוע קסום!");
-            return;
-        }
+        $('gridHead').innerHTML = '<th class="time-h"></th>' + dates.map((d, i) => {
+            const ds = ymd(d);
+            const off = offReason(ds);
+            return `<th class="${ds === todayStr ? 'today' : ''}">
+                <div class="day-pill"><span class="day-name">${DAY_NAMES[i]}</span><span class="day-date">${dm(d)}</span></div>
+                <div class="day-events">${dayEventsHTML(ds)}</div>
+                ${off ? '' : `<button class="add-ev" data-act="new-event" data-date="${ds}">+ מבחן / אירוע</button>`}
+            </th>`;
+        }).join('');
 
-        let currentLesson = null;
-        let nextLesson = null;
-
-        hoursConfig.forEach(h => {
-            if (currentTimeStr >= h.start && currentTimeStr <= h.end) {
-                const sub = schedule[dayIdx] ? schedule[dayIdx][h.id] : null;
-                if (sub) currentLesson = { sub, time: h.time };
-            } else if (currentTimeStr < h.start && !nextLesson) {
-                const sub = schedule[dayIdx] ? schedule[dayIdx][h.id] : null;
-                if (sub) nextLesson = { sub, time: h.start };
+        const body = ROWS.map((row, r) => {
+            if (row.type === 'break') {
+                // ימי חופשה מכוסים כבר על ידי תא אחד עם rowspan
+                const cells = dates.map(d => offReason(ymd(d)) ? '' : '<td></td>').join('');
+                return `<tr class="break"><td class="time-c">☕ ${row.min} דק׳</td>${cells}</tr>`;
             }
-        });
-
-        if (currentLesson) {
-            trackerElement.innerText = `עכשיו: ${currentLesson.sub} (${currentLesson.time})`;
-        } else if (nextLesson) {
-            trackerElement.innerText = `השיעור הבא: ${nextLesson.sub} בשעה ${nextLesson.time}`;
-        } else {
-            trackerElement.innerText = "אין שיעורים נוספים היום";
-        }
-
-        // חישוב התקדמות ליום הלימודים הנוכחי
-        const dayLessons = schedule[dayIdx] ? Object.keys(schedule[dayIdx]).map(Number) : [];
-        if (!dayLessons.length) {
-            updateDayProgress(100, "אין שיעורים מתוכננים להיום");
-            return;
-        }
-
-        const startHourConfig = hoursConfig[Math.min(...dayLessons)];
-        const endHourConfig = hoursConfig[Math.max(...dayLessons)];
-
-        if (currentTimeStr < startHourConfig.start) {
-            updateDayProgress(0, "יום הלימודים טרם החל");
-        } else if (currentTimeStr > endHourConfig.end) {
-            updateDayProgress(100, "יום הלימודים הסתיים!");
-        } else {
-            const [sH, sM] = startHourConfig.start.split(':').map(Number);
-            const [eH, eM] = endHourConfig.end.split(':').map(Number);
-            const [cH, cM] = currentTimeStr.split(':').map(Number);
-
-            const totalMin = (eH * 60 + eM) - (sH * 60 + sM);
-            const passedMin = (cH * 60 + cM) - (sH * 60 + sM);
-            const percent = Math.min(100, Math.max(0, Math.round((passedMin / totalMin) * 100)));
-            updateDayProgress(percent, `התקדמות יום הלימודים: ${percent}%`);
-        }
-    }
-
-    function updateDayProgress(percent, text) {
-        document.getElementById('dayProgressBarFill').style.width = percent + '%';
-        document.getElementById('dayProgressText').innerText = text;
-    }
-
-    /* חישוב ספירה לאחור לחופשה הקרובה */
-    function updateHolidayCountdown() {
-        const today = new Date();
-        today.setHours(0,0,0,0);
-
-        let nextHoliday = null;
-        for (let h of holidays) {
-            const hStart = new Date(h.start);
-            if (hStart >= today) {
-                nextHoliday = { name: h.name, start: hStart };
-                break;
-            }
-        }
-
-        const el = document.getElementById('holidayCountdownText');
-        if (nextHoliday) {
-            const diffTime = nextHoliday.start - today;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            if (diffDays === 0) {
-                el.innerText = `🎉 חופשת ${nextHoliday.name} מתחילה היום!`;
-            } else {
-                el.innerText = `⏳ עוד ${diffDays} ימים לחופשת ${nextHoliday.name}`;
-            }
-        } else {
-            el.innerText = `🎉 סיום שנת הלימודים קרוב!`;
-        }
-    }
-
-    function renderBoard() {
-        const weekDates = Array.from({length: 6}, (_, i) => {
-            const d = new Date(currentSundayDate);
-            d.setDate(d.getDate() + i);
-            return d;
-        });
-
-        document.getElementById('weekDisplay').innerText = `${formatDisplayDate(weekDates[0])} - ${formatDisplayDate(weekDates[5])}`;
-
-        weekDates.forEach((currentDate, i) => {
-            const dateStr = formatDate(currentDate);
-            const th = document.getElementById(`th-${i}`);
-            const dayEvents = eventsData[dateStr] || [];
-            const holidayName = getHolidayName(dateStr);
-            const schoolEventName = schoolEvents[dateStr];
-
-            let eventsHTML = schoolEventName ? `<div class="event-badge school-event"><span>🎉 ${schoolEventName}</span></div>` : '';
-            if (dayEvents.length) {
-                eventsHTML += '<div class="events-container">' + dayEvents.map((evt, idx) => `
-                    <div class="event-badge">
-                        <span>📝 ${evt.title} (${evt.startHour}-${evt.endHour})</span>
-                        <span class="remove-btn" onclick="removeEvent('${dateStr}', ${idx})">✕</span>
-                    </div>`).join('') + '</div>';
-            }
-
-            const addBtnHTML = (currentDate >= START_DATE && !holidayName) ? `<button class="add-event-btn" onclick="openEventModal('${dateStr}', '${dayNames[i]}')">+ אירוע/מבחן</button>` : '';
-            th.innerHTML = `${dayNames[i]} <span class="date-sub">${formatDisplayDate(currentDate)}</span>${eventsHTML}${addBtnHTML}`;
-        });
-
-        const tbody = document.getElementById('scheduleBody');
-        tbody.innerHTML = '';
-
-        const now = new Date();
-        const todayStr = formatDate(now);
-        const currentTimeStr = now.toTimeString().substring(0, 5);
-
-        hoursConfig.forEach(hour => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td class="time-col">שעה ${hour.id}<span>${hour.time}</span></td>`;
-
-            weekDates.forEach((currentDate, dayIdx) => {
-                const td = document.createElement('td');
-                const dateStr = formatDate(currentDate);
-                const holidayName = getHolidayName(dateStr);
-
-                if (currentDate < START_DATE || holidayName) {
-                    td.innerHTML = `<div class="vacation-cell">🏖️ ${holidayName || 'חופש'}</div>`;
-                    tr.appendChild(td);
+            const h = row.h;
+            const isNowRow = nowHour === h && dates.some(d => ymd(d) === todayStr);
+            let tr = `<tr><td class="time-c${isNowRow ? ' now-row' : ''}"><strong>שעה ${h}</strong><span>${hourLabel(h)}</span></td>`;
+            dates.forEach((d, i) => {
+                const ds = ymd(d);
+                const off = offReason(ds);
+                if (off) {
+                    if (r === 0) tr += `<td class="vac-td" rowspan="${ROWS.length}"><div class="vac-block"><span class="emoji">🏖️</span>${esc(off)}</div></td>`;
                     return;
                 }
-
-                const subject = schedule[dayIdx] ? schedule[dayIdx][hour.id] : null;
-                const slotKey = `${dateStr}_${hour.id}`;
-                const currentStatus = attendanceData[slotKey];
-                const note = notesData[slotKey];
-
-                if (subject) {
-                    let cardClass = 'lesson-card';
-                    if (currentStatus === 'yes') cardClass += ' held';
-                    if (currentStatus === 'no') cardClass += ' canceled';
-                    
-                    if (dateStr === todayStr && currentTimeStr >= hour.start && currentTimeStr <= hour.end) {
-                        cardClass += ' active-now';
-                    }
-
-                    // סינון והדגשה לפי בחירה או חיפוש
-                    const isSubjectMatch = selectedFilterSubject ? subject === selectedFilterSubject : true;
-                    const isSearchMatch = searchQuery ? subject.toLowerCase().includes(searchQuery) : true;
-
-                    if (!isSubjectMatch || !isSearchMatch) {
-                        cardClass += ' dimmed';
-                    } else if (selectedFilterSubject || searchQuery) {
-                        cardClass += ' highlighted';
-                    }
-
-                    const noteTagHTML = note ? `<div class="lesson-note-tag" title="${note}">📌 ${note}</div>` : '';
-
-                    td.innerHTML = `
-                        <div class="${cardClass}">
-                            <div class="lesson-header-row">
-                                <div class="lesson-title">${subject}</div>
-                                <button class="note-btn" onclick="addNote('${dateStr}', ${hour.id})" title="הוסף הערה">✏️</button>
-                            </div>
-                            ${noteTagHTML}
-                            <div class="status-actions">
-                                <button class="action-btn" onclick="toggleStatus('${dateStr}', ${hour.id}, 'yes')">✅</button>
-                                <button class="action-btn" onclick="toggleStatus('${dateStr}', ${hour.id}, 'no')">❌</button>
-                            </div>
-                        </div>`;
-                }
-                tr.appendChild(td);
+                const subject = SCHEDULE[i] ? SCHEDULE[i][h] : null;
+                const cls = [ds === todayStr ? 'today' : '', subject ? '' : 'empty-slot'].filter(Boolean).join(' ');
+                tr += `<td${cls ? ` class="${cls}"` : ''}>${subject ? lessonHTML(ds, h, subject, ds === todayStr && nowHour === h) : ''}</td>`;
             });
-            tbody.appendChild(tr);
-        });
+            return tr + '</tr>';
+        }).join('');
+        $('gridBody').innerHTML = body;
+    }
 
-        renderStats();
-        updateLiveTracker();
-        updateHolidayCountdown();
+    /* ===================== רינדור: תצוגת יום (מובייל) ===================== */
+
+    function renderDayView() {
+        const dates = weekDates();
+        const todayStr = ymd(new Date());
+        if (state.mobileDay === null || state.mobileDay > 5) {
+            const ti = dates.findIndex(d => ymd(d) === todayStr);
+            state.mobileDay = ti >= 0 ? ti : 0;
+        }
+
+        $('dayTabs').innerHTML = dates.map((d, i) => {
+            const ds = ymd(d);
+            const hasEv = (state.events[ds] || []).length > 0;
+            return `<button class="day-tab${i === state.mobileDay ? ' active' : ''}${ds === todayStr ? ' is-today' : ''}" data-act="day" data-i="${i}">
+                ${hasEv ? '<span class="dot"></span>' : ''}${DAY_LETTERS[i]}<small>${dm(d)}</small>
+            </button>`;
+        }).join('');
+
+        const d = dates[state.mobileDay];
+        const ds = ymd(d);
+        const off = offReason(ds);
+        const nowHour = currentHour(new Date());
+
+        $('dvEvents').innerHTML = dayEventsHTML(ds) + (off ? '' : `<button class="add-ev" data-act="new-event" data-date="${ds}">+ מבחן / אירוע ליום ${DAY_NAMES[state.mobileDay]}</button>`);
+
+        if (off) {
+            $('dvList').innerHTML = `<div class="vac-block"><span class="emoji">🏖️</span>${esc(off)}</div>`;
+            return;
+        }
+
+        const day = SCHEDULE[state.mobileDay] || {};
+        const lessonHours = Object.keys(day).map(Number);
+        if (!lessonHours.length) {
+            $('dvList').innerHTML = '<div class="empty">אין שיעורים ביום הזה</div>';
+            return;
+        }
+        const first = Math.min(...lessonHours), last = Math.max(...lessonHours);
+        let html = '';
+        ROWS.forEach(row => {
+            if (row.type === 'break') {
+                if (toMin(row.from) > toMin(HOURS[first].start) && toMin(row.to) < toMin(HOURS[last].end))
+                    html += `<div class="dv-break">☕ הפסקה · ${row.min} דק׳</div>`;
+                return;
+            }
+            const h = row.h;
+            if (h < first || h > last) return;
+            const subject = day[h];
+            html += `<div class="dv-row">
+                <div class="dv-time"><strong>שעה ${h}</strong>${HOURS[h].start}</div>
+                ${subject ? lessonHTML(ds, h, subject, ds === todayStr && nowHour === h) : '<div class="dv-empty"></div>'}
+            </div>`;
+        });
+        $('dvList').innerHTML = html;
+    }
+
+    /* ===================== רינדור: אריחי סטטוס ===================== */
+
+    function renderLive() {
+        const now = new Date();
+        const ds = ymd(now);
+        const dow = now.getDay();
+        const m = now.getHours() * 60 + now.getMinutes();
+
+        $('todayLabel').textContent = now.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+        const set = (label, main, sub, pct, live) => {
+            $('liveLabel').textContent = label;
+            $('liveMain').textContent = main;
+            $('liveSub').textContent = sub;
+            $('dayBar').style.width = (pct ?? 0) + '%';
+            $('liveDot').classList.toggle('idle', !live);
+        };
+
+        if (dow === 6) return set('היום', 'שבת שלום! 🌿', 'אין לימודים היום', 100, false);
+        const off = offReason(ds);
+        if (off) return set('היום', `חופשה: ${off} 🏖️`, 'אין לימודים היום', 100, false);
+
+        const day = SCHEDULE[dow] || {};
+        const hours = Object.keys(day).map(Number).sort((a, b) => a - b);
+        if (!hours.length) return set('היום', 'אין שיעורים היום', '', 100, false);
+
+        const startM = toMin(HOURS[hours[0]].start);
+        const endM = toMin(HOURS[hours[hours.length - 1]].end);
+        const pct = Math.max(0, Math.min(100, Math.round((m - startM) / (endM - startM) * 100)));
+
+        const cur = hours.find(h => m >= toMin(HOURS[h].start) && m < toMin(HOURS[h].end));
+        if (cur !== undefined) {
+            // סוף הרצף של אותו מקצוע (שיעור כפול / משולש)
+            let last = cur;
+            while (day[last + 1] === day[cur]) last++;
+            const left = toMin(HOURS[last].end) - m;
+            const canceled = state.attendance[`${ds}_${cur}`] === 'no';
+            return set('עכשיו בשיעור', `${day[cur]}${canceled ? ' (בוטל)' : ''}`, `עד ${HOURS[last].end} · עוד ${left} דק׳ · ${pct}% מהיום עבר`, pct, true);
+        }
+        const next = hours.find(h => toMin(HOURS[h].start) > m);
+        if (next !== undefined) {
+            const wait = toMin(HOURS[next].start) - m;
+            const label = m < startM ? 'היום מתחיל ב-' + HOURS[next].start : 'הפסקה';
+            return set(label, `הבא: ${day[next]}`, `בשעה ${HOURS[next].start} · בעוד ${wait} דק׳`, pct, m >= startM);
+        }
+        set('היום', 'יום הלימודים הסתיים! 🎉', `השיעור האחרון נגמר ב-${HOURS[hours[hours.length - 1]].end}`, 100, false);
+    }
+
+    function renderHoliday() {
+        const today = new Date();
+        const ds = ymd(today);
+        const main = $('holidayMain');
+        const cur = HOLIDAYS.find(h => ds >= h.start && ds <= h.end);
+        if (cur) {
+            main.innerHTML = `<span class="tile-main">חופשת ${esc(cur.name)} 🎉</span>`;
+            $('holidaySub').textContent = `חוזרים ללימודים אחרי ${dm(parseYmd(cur.end))}`;
+            return;
+        }
+        const next = HOLIDAYS.find(h => h.start > ds);
+        if (next) {
+            const n = dayDiff(today, parseYmd(next.start));
+            main.innerHTML = `<span class="big vac">${n}</span><span class="tile-main">${n === 1 ? 'יום' : 'ימים'} ל${esc(next.name)}</span>`;
+            const len = dayDiff(parseYmd(next.start), parseYmd(next.end)) + 1;
+            $('holidaySub').textContent = `${dm(parseYmd(next.start))} – ${dm(parseYmd(next.end))} · ${len === 1 ? 'יום אחד' : len + ' ימי חופש'}`;
+        } else if (ds <= SCHOOL_END) {
+            const n = dayDiff(today, addDays(parseYmd(SCHOOL_END), 1));
+            main.innerHTML = `<span class="big vac">${n}</span><span class="tile-main">ימים לחופש הגדול</span>`;
+            $('holidaySub').textContent = `סוף שנת הלימודים: ${dm(parseYmd(SCHOOL_END))}`;
+        } else {
+            main.innerHTML = '<span class="tile-main">החופש הגדול ☀️</span>';
+            $('holidaySub').textContent = 'שנת הלימודים הסתיימה';
+        }
+    }
+
+    function upcomingEvents() {
+        const todayStr = ymd(new Date());
+        const list = [];
+        Object.keys(state.events).forEach(ds => {
+            if (ds >= todayStr) eventsOn(ds).forEach(e => list.push(e));
+        });
+        return list.sort((a, b) => a.date.localeCompare(b.date) || a.startHour - b.startHour);
+    }
+
+    function renderUpcoming() {
+        const list = upcomingEvents();
+        const today = new Date();
+
+        if (list.length) {
+            const e = list[0];
+            const t = evType(e);
+            $('nextEvMain').textContent = `${EVENT_TYPES[t].icon} ${e.title}`;
+            $('nextEvSub').textContent = `${daysWord(dayDiff(today, parseYmd(e.date)))} · יום ${DAY_NAMES[parseYmd(e.date).getDay()]} ${dm(parseYmd(e.date))} · ${hoursRange(e.startHour, e.endHour)}`;
+            $('nextEvTile').dataset.date = e.date;
+            $('nextEvTile').dataset.idx = e.idx;
+        } else {
+            $('nextEvMain').textContent = 'אין מבחנים קרובים';
+            $('nextEvSub').textContent = 'לחץ על "+ מבחן / אירוע" ביום בטבלה';
+            delete $('nextEvTile').dataset.date;
+        }
+
+        $('upcoming').innerHTML = list.length ? list.slice(0, 8).map(e => {
+            const d = parseYmd(e.date);
+            const t = evType(e);
+            return `<button class="up-item" data-act="edit-event" data-date="${e.date}" data-idx="${e.idx}" data-jump="1">
+                <div class="up-date t-${t}"><strong>${d.getDate()}</strong><small>${d.toLocaleDateString('he-IL', { month: 'short' })}</small></div>
+                <div style="min-width:0">
+                    <div class="up-title">${EVENT_TYPES[t].icon} ${esc(e.title)}</div>
+                    <div class="up-sub">${daysWord(dayDiff(today, d))} · יום ${DAY_NAMES[d.getDay()]} · ${hoursRange(e.startHour, e.endHour)}</div>
+                </div>
+            </button>`;
+        }).join('') : '<div class="empty">אין מבחנים או אירועים מתוכננים. אפשר להוסיף מכל יום בטבלה.</div>';
+    }
+
+    /* ===================== רינדור: סטטיסטיקה ו-15% ===================== */
+
+    // סופר את כל השיעורים שכבר הסתיימו עד הרגע הזה (בלי חופשות).
+    // שיעור נחשב "התקיים" אלא אם סומן כבוטל.
+    function lessonsUntilNow() {
+        const now = new Date();
+        const todayStr = ymd(now);
+        const nowMin = now.getHours() * 60 + now.getMinutes();
+        const stats = {};
+        SUBJECTS.forEach(s => { stats[s] = { past: 0, canceled: 0, held: 0, marked: 0 }; });
+
+        for (let d = parseYmd(SCHOOL_START); ymd(d) <= todayStr && ymd(d) <= SCHOOL_END; d = addDays(d, 1)) {
+            const ds = ymd(d);
+            if (offReason(ds)) continue;
+            const day = SCHEDULE[d.getDay()];
+            if (!day) continue;
+            for (const [h, s] of Object.entries(day)) {
+                if (ds === todayStr && toMin(HOURS[h].end) > nowMin) continue; // עוד לא נגמר
+                const st = stats[s];
+                st.past++;
+                const mark = state.attendance[`${ds}_${h}`];
+                if (mark === 'no') st.canceled++;
+                else st.held++;
+                if (mark === 'yes') st.marked++;
+            }
+        }
+        return stats;
     }
 
     function renderStats() {
-        const stats = {};
-        let grandYes = 0, grandNo = 0;
+        const stats = lessonsUntilNow();
+        const all = Object.values(stats);
+        const held = all.reduce((a, s) => a + s.held, 0);
+        const canceled = all.reduce((a, s) => a + s.canceled, 0);
+        const marked = all.reduce((a, s) => a + s.marked, 0);
 
-        for (let day in schedule) {
-            for (let hour in schedule[day]) {
-                const name = schedule[day][hour];
-                if (!stats[name]) stats[name] = { yes: 0, no: 0 };
-            }
-        }
+        $('totalHeld').textContent = held;
+        $('totalNo').textContent = canceled;
+        $('totalYes').textContent = marked;
 
-        for (let key in attendanceData) {
-            const status = attendanceData[key];
-            const [dateStr, hourId] = key.split('_');
-            const dayIdx = new Date(dateStr).getDay();
-            if (schedule[dayIdx] && schedule[dayIdx][hourId]) {
-                const subject = schedule[dayIdx][hourId];
-                if (stats[subject]) {
-                    if (status === 'yes') { stats[subject].yes++; grandYes++; }
-                    if (status === 'no') { stats[subject].no++; grandNo++; }
-                }
-            }
-        }
+        const now = new Date();
+        $('quotaFoot').textContent = `נכון ל${now.toLocaleDateString('he-IL', { weekday: 'long' })} ${dm(now)}, ${pad(now.getHours())}:${pad(now.getMinutes())} · שיעורים שבוטלו (✕) לא נספרים`;
 
-        document.getElementById('totalHeld').innerText = grandYes;
-        document.getElementById('totalCanceled').innerText = grandNo;
-
-        const statsGrid = document.getElementById('statsGrid');
-        statsGrid.innerHTML = '';
-
-        for (let subject in stats) {
-            const total = stats[subject].yes + stats[subject].no;
-            const percent = total > 0 ? Math.round((stats[subject].yes / total) * 100) : 0;
-            const card = document.createElement('div');
-            card.className = 'subject-card';
-            card.innerHTML = `
-                <div class="subject-card-top">
-                    <span class="subject-name">${subject}</span>
-                    <span class="subject-percent">${total > 0 ? percent + '%' : '-'}</span>
+        $('stats').innerHTML = SUBJECTS.map(s => {
+            const st = stats[s];
+            const pct = st.past ? Math.round(st.held / st.past * 100) : 0;
+            const ex = st.held * QUOTA_PERCENT / 100;
+            const exText = Number.isInteger(ex) ? `${ex}` : `${ex.toLocaleString('en-US', { maximumFractionDigits: 2 })} → ${quotaOf(st.held)}`;
+            return `<button class="stat${state.filter === s ? ' active' : ''}" style="--h:${HUE[s]};--p:${pct}" data-act="filter" data-subject="${esc(s)}" title="הדגש את ${esc(s)} בטבלה">
+                <div class="stat-top">
+                    <div class="ring"><span>${st.past ? pct + '%' : '–'}</span></div>
+                    <div>
+                        <div class="stat-name">${esc(s)}</div>
+                        <div class="stat-sub">${st.held} שיעורים התקיימו</div>
+                    </div>
                 </div>
-                <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${percent}%;"></div></div>
-                <div class="subject-badges">
-                    <span>✅ ${stats[subject].yes} התקיימו</span>
-                    <span>❌ ${stats[subject].no} בוטלו</span>
-                </div>`;
-            statsGrid.appendChild(card);
+                <div class="stat-quota">
+                    <div>
+                        <div class="sq-label">15% מהשיעורים</div>
+                        <div class="sq-calc">${st.held} × 15% = ${exText}</div>
+                    </div>
+                    <div class="sq-num">${quotaOf(st.held)}</div>
+                </div>
+                <div class="stat-chips">
+                    ${st.canceled ? `<span class="chip bad">✕ ${st.canceled} בוטלו</span>` : ''}
+                    <span class="chip">✓ ${st.marked} סומנו</span>
+                </div>
+            </button>`;
+        }).join('');
+    }
+
+    function renderBackupStatus() {
+        const last = localStorage.getItem(KEYS.lastBackup);
+        const el = $('backupStatus');
+        const hasData = Object.keys(state.attendance).length + Object.keys(state.events).length + Object.keys(state.notes).length > 0;
+        let text, warn = false;
+        if (!last) {
+            text = hasData ? 'עדיין לא הורדת גיבוי' : 'אין עדיין נתונים לגבות';
+            warn = hasData;
+        } else {
+            const n = dayDiff(new Date(last), new Date());
+            text = n === 0 ? 'גיבוי אחרון: היום' : n === 1 ? 'גיבוי אחרון: אתמול' : `גיבוי אחרון: לפני ${n} ימים`;
+            warn = n >= 7;
         }
+        el.classList.toggle('warn', warn);
+        el.querySelector('span').textContent = text;
     }
 
-    /* ייצוא וייבוא נתונים */
-    function exportData() {
-        const data = { attendanceData, eventsData, notesData };
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
-        const downloadAnchor = document.createElement('a');
-        downloadAnchor.setAttribute("href", dataStr);
-        downloadAnchor.setAttribute("download", `schedule_backup_${formatDate(new Date())}.json`);
-        document.body.appendChild(downloadAnchor);
-        downloadAnchor.click();
-        downloadAnchor.remove();
+    function renderFilterOptions() {
+        $('subjectFilter').innerHTML = '<option value="">כל המקצועות</option>' +
+            SUBJECTS.map(s => `<option value="${esc(s)}"${s === state.filter ? ' selected' : ''}>${esc(s)}</option>`).join('');
     }
 
-    function importData(event) {
-        const fileReader = new FileReader();
-        fileReader.onload = function (e) {
+    function render() {
+        renderWeekNav();
+        renderGrid();
+        renderDayView();
+        renderLive();
+        renderHoliday();
+        renderUpcoming();
+        renderStats();
+        renderBackupStatus();
+    }
+
+    /* ===================== פעולות ===================== */
+
+    function toast(msg, isErr) {
+        const t = document.createElement('div');
+        t.className = 'toast' + (isErr ? ' err' : '');
+        t.textContent = msg;
+        $('toasts').appendChild(t);
+        setTimeout(() => t.remove(), 2800);
+    }
+
+    function setWeek(sunday) {
+        if (sunday < MIN_SUNDAY) sunday = MIN_SUNDAY;
+        if (sunday > MAX_SUNDAY) sunday = MAX_SUNDAY;
+        if (sunday.getTime() !== state.week.getTime()) state.mobileDay = null;
+        state.week = sunday;
+        render();
+    }
+
+    function toggleStatus(key, val) {
+        if (state.attendance[key] === val) delete state.attendance[key];
+        else state.attendance[key] = val;
+        store(KEYS.attendance, state.attendance);
+        render();
+    }
+
+    function fillHourSelect(sel) {
+        sel.innerHTML = HOURS.map(h => `<option value="${h.id}">שעה ${h.id} (${h.start}–${h.end})</option>`).join('');
+    }
+
+    function openEvent(dateStr, idx) {
+        const editing = idx !== undefined && state.events[dateStr] && state.events[dateStr][idx];
+        state.editing = editing ? { date: dateStr, idx } : null;
+        const e = editing || {};
+        const d = parseYmd(dateStr);
+
+        $('evTitle').textContent = editing ? 'עריכת אירוע' : 'מבחן / אירוע חדש';
+        $('evSub').textContent = `יום ${DAY_NAMES[d.getDay()] || ''}, ${d.toLocaleDateString('he-IL', { day: 'numeric', month: 'long' })}`;
+        $('evName').value = e.title || '';
+        $('evDate').value = dateStr;
+        $('evDate').min = SCHOOL_START;
+        $('evDate').max = SCHOOL_END;
+        const type = editing ? evType(e) : 'test';
+        document.querySelector(`input[name="evType"][value="${type}"]`).checked = true;
+
+        // ברירת מחדל: השעות של השיעור הראשון ביום
+        const dayHours = Object.keys(SCHEDULE[d.getDay()] || {}).map(Number);
+        const def = dayHours.length ? Math.min(...dayHours) : 1;
+        $('evStart').value = e.startHour ?? def;
+        $('evEnd').value = e.endHour ?? def;
+        $('evDelete').hidden = !editing;
+        $('eventDialog').showModal();
+        $('evName').focus();
+    }
+
+    function saveEvent() {
+        const title = $('evName').value.trim();
+        const date = $('evDate').value;
+        if (!title || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+        let startHour = +$('evStart').value, endHour = +$('evEnd').value;
+        if (endHour < startHour) [startHour, endHour] = [endHour, startHour];
+        const type = document.querySelector('input[name="evType"]:checked').value;
+        const item = { title, startHour, endHour, type };
+
+        if (state.editing) removeEventRaw(state.editing.date, state.editing.idx);
+        (state.events[date] = state.events[date] || []).push(item);
+        state.events[date].sort((a, b) => a.startHour - b.startHour);
+        store(KEYS.events, state.events);
+
+        const sunday = sundayOf(parseYmd(date));
+        if (sunday.getTime() !== state.week.getTime()) setWeek(sunday); else render();
+        toast(state.editing ? 'האירוע עודכן' : 'האירוע נוסף ✓');
+    }
+
+    function removeEventRaw(date, idx) {
+        if (!state.events[date]) return;
+        state.events[date].splice(idx, 1);
+        if (!state.events[date].length) delete state.events[date];
+    }
+
+    function openNote(key) {
+        const [ds, h] = key.split('_');
+        state.noteKey = key;
+        const d = parseYmd(ds);
+        $('noteTitle').textContent = `הערה · ${subjectAt(ds, h) || ''}`;
+        $('noteSub').textContent = `יום ${DAY_NAMES[d.getDay()]} ${dm(d)} · שעה ${h} (${hourLabel(+h)})`;
+        $('noteText').value = state.notes[key] || '';
+        $('noteDelete').hidden = !state.notes[key];
+        $('noteDialog').showModal();
+        $('noteText').focus();
+    }
+
+    function saveNote(text) {
+        const key = state.noteKey;
+        if (!key) return;
+        text = text.trim();
+        if (text) state.notes[key] = text; else delete state.notes[key];
+        store(KEYS.notes, state.notes);
+        render();
+    }
+
+    /* ===================== גיבוי JSON ===================== */
+
+    function exportJSON() {
+        // אותו מבנה כמו בגרסה הקודמת, עם שדות מידע נוספים
+        const data = {
+            app: 'weekly-schedule',
+            version: 2,
+            exportedAt: new Date().toISOString(),
+            attendanceData: state.attendance,
+            eventsData: state.events,
+            notesData: state.notes
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `schedule_backup_${ymd(new Date())}.json`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        store(KEYS.lastBackup, new Date().toISOString());
+        renderBackupStatus();
+        toast('קובץ הגיבוי ירד ✓');
+    }
+
+    // בודק ומנקה את הקובץ, כך שקובץ פגום לא ישבור את האתר
+    function sanitize(raw) {
+        if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new Error('bad');
+        const isObj = v => v && typeof v === 'object' && !Array.isArray(v);
+        const keyRe = /^\d{4}-\d{2}-\d{2}_\d{1,2}$/;
+        const dateRe = /^\d{4}-\d{2}-\d{2}$/;
+        if (!isObj(raw.attendanceData) && !isObj(raw.eventsData) && !isObj(raw.notesData)) throw new Error('bad');
+
+        const attendance = {}, events = {}, notes = {};
+        if (isObj(raw.attendanceData)) for (const [k, v] of Object.entries(raw.attendanceData))
+            if (keyRe.test(k) && (v === 'yes' || v === 'no')) attendance[k] = v;
+        if (isObj(raw.notesData)) for (const [k, v] of Object.entries(raw.notesData))
+            if (keyRe.test(k) && typeof v === 'string' && v.trim()) notes[k] = v.trim().slice(0, 300);
+        if (isObj(raw.eventsData)) for (const [d, list] of Object.entries(raw.eventsData)) {
+            if (!dateRe.test(d) || !Array.isArray(list)) continue;
+            const clean = list.filter(e => e && typeof e.title === 'string' && e.title.trim())
+                .map(e => {
+                    const s = Math.max(0, Math.min(HOURS.length - 1, parseInt(e.startHour) || 0));
+                    const en = Math.max(s, Math.min(HOURS.length - 1, parseInt(e.endHour) || s));
+                    const out = { title: e.title.trim().slice(0, 80), startHour: s, endHour: en };
+                    if (EVENT_TYPES[e.type]) out.type = e.type;
+                    return out;
+                });
+            if (clean.length) events[d] = clean;
+        }
+        return { attendance, events, notes };
+    }
+
+    function readImportFile(file) {
+        if (!file) return;
+        if (!/\.json$/i.test(file.name) && file.type !== 'application/json') {
+            toast('צריך לבחור קובץ ‎.json', true);
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => {
             try {
-                const parsed = JSON.parse(e.target.result);
-                if (parsed.attendanceData) localStorage.setItem('myWeeklyAttendance', JSON.stringify(parsed.attendanceData));
-                if (parsed.eventsData) localStorage.setItem('myWeeklyEvents', JSON.stringify(parsed.eventsData));
-                if (parsed.notesData) localStorage.setItem('myWeeklyNotes', JSON.stringify(parsed.notesData));
-                
-                attendanceData = parsed.attendanceData || {};
-                eventsData = parsed.eventsData || {};
-                notesData = parsed.notesData || {};
-                
-                alert('הנתונים שוחזרו בהצלחה!');
-                renderBoard();
-            } catch (err) {
-                alert('קובץ לא תקין');
+                const data = sanitize(JSON.parse(reader.result));
+                state.pendingImport = data;
+                const evCount = Object.values(data.events).reduce((a, l) => a + l.length, 0);
+                $('importFile').textContent = `📄 ${file.name}`;
+                $('impAtt').textContent = Object.keys(data.attendance).length;
+                $('impEv').textContent = evCount;
+                $('impNotes').textContent = Object.keys(data.notes).length;
+                $('importDialog').showModal();
+            } catch {
+                toast('הקובץ לא תקין או לא קובץ גיבוי של המערכת', true);
             }
         };
-        fileReader.readAsText(event.target.files[0]);
+        reader.onerror = () => toast('לא הצלחתי לקרוא את הקובץ', true);
+        reader.readAsText(file);
     }
 
-    function initModalHours() {
-        const start = document.getElementById('startHourSelect');
-        const end = document.getElementById('endHourSelect');
-        hoursConfig.forEach(h => {
-            start.innerHTML += `<option value="${h.id}">שעה ${h.id} (${h.time})</option>`;
-            end.innerHTML += `<option value="${h.id}">שעה ${h.id} (${h.time})</option>`;
-        });
+    function applyImport(mode) {
+        const data = state.pendingImport;
+        if (!data) return;
+        if (mode === 'replace') {
+            state.attendance = data.attendance;
+            state.events = data.events;
+            state.notes = data.notes;
+        } else {
+            Object.assign(state.attendance, data.attendance);
+            Object.assign(state.notes, data.notes);
+            for (const [d, list] of Object.entries(data.events)) {
+                const cur = state.events[d] || [];
+                list.forEach(e => {
+                    if (!cur.some(c => c.title === e.title && c.startHour === e.startHour && c.endHour === e.endHour)) cur.push(e);
+                });
+                state.events[d] = cur.sort((a, b) => a.startHour - b.startHour);
+            }
+        }
+        store(KEYS.attendance, state.attendance);
+        store(KEYS.events, state.events);
+        store(KEYS.notes, state.notes);
+        state.pendingImport = null;
+        $('importDialog').close();
+        render();
+        toast(mode === 'replace' ? 'הנתונים הוחלפו מהקובץ ✓' : 'הנתונים מוזגו בהצלחה ✓');
     }
 
-    initModalHours();
-    initFilterDropdown();
-    renderBoard();
-    setInterval(updateLiveTracker, 30000);
+    /* ===================== ערכת נושא ===================== */
+
+    function applyTheme(dark) {
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        $('themeBtn').textContent = dark ? '☀️' : '🌙';
+        document.querySelector('meta[name="theme-color"]').content = dark ? '#0c0c0e' : '#f6f6f5';
+    }
+    {
+        const saved = localStorage.getItem(KEYS.dark);
+        applyTheme(saved === null ? matchMedia('(prefers-color-scheme: dark)').matches : saved === 'true');
+    }
+
+    /* ===================== אירועים ===================== */
+
+    $('prevWeek').onclick = () => setWeek(addDays(state.week, -7));
+    $('nextWeek').onclick = () => setWeek(addDays(state.week, 7));
+    $('thisWeek').onclick = () => { state.mobileDay = null; setWeek(defaultWeek()); };
+    $('themeBtn').onclick = () => {
+        const dark = document.documentElement.dataset.theme !== 'dark';
+        applyTheme(dark);
+        store(KEYS.dark, String(dark));
+    };
+
+    $('search').oninput = e => { state.search = e.target.value.trim().toLowerCase(); renderGrid(); renderDayView(); };
+    $('subjectFilter').onchange = e => { state.filter = e.target.value; render(); };
+
+    $('exportBtn').onclick = exportJSON;
+    $('importBtn').onclick = () => $('fileInput').click();
+    $('fileInput').onchange = e => { readImportFile(e.target.files[0]); e.target.value = ''; };
+    $('impMerge').onclick = () => applyImport('merge');
+    $('impReplace').onclick = () => applyImport('replace');
+
+    $('nextEvTile').onclick = () => {
+        const t = $('nextEvTile');
+        if (t.dataset.date) { setWeek(sundayOf(parseYmd(t.dataset.date))); openEvent(t.dataset.date, +t.dataset.idx); }
+    };
+    $('nextEvTile').onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('nextEvTile').click(); } };
+
+    // האזנה אחת לכל הכפתורים שנוצרים דינמית
+    document.addEventListener('click', e => {
+        const el = e.target.closest('[data-act]');
+        if (!el) return;
+        const act = el.dataset.act;
+        if (act === 'status') toggleStatus(el.dataset.key, el.dataset.val);
+        else if (act === 'note') openNote(el.dataset.key);
+        else if (act === 'new-event') openEvent(el.dataset.date);
+        else if (act === 'edit-event') {
+            if (el.dataset.jump) setWeek(sundayOf(parseYmd(el.dataset.date)));
+            openEvent(el.dataset.date, +el.dataset.idx);
+        }
+        else if (act === 'day') { state.mobileDay = +el.dataset.i; renderDayView(); }
+        else if (act === 'filter') {
+            state.filter = state.filter === el.dataset.subject ? '' : el.dataset.subject;
+            $('subjectFilter').value = state.filter;
+            render();
+            if (state.filter) $('board').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
+
+    document.querySelectorAll('dialog [data-close]').forEach(b => b.onclick = () => b.closest('dialog').close());
+    document.querySelectorAll('dialog').forEach(d => d.addEventListener('click', e => { if (e.target === d) d.close(); }));
+
+    $('eventForm').onsubmit = e => { e.preventDefault(); saveEvent(); $('eventDialog').close(); };
+    $('evStart').onchange = () => { if (+$('evEnd').value < +$('evStart').value) $('evEnd').value = $('evStart').value; };
+    $('evDelete').onclick = () => {
+        if (!state.editing) return;
+        removeEventRaw(state.editing.date, state.editing.idx);
+        store(KEYS.events, state.events);
+        $('eventDialog').close();
+        render();
+        toast('האירוע נמחק');
+    };
+
+    $('noteForm').onsubmit = e => { e.preventDefault(); saveNote($('noteText').value); $('noteDialog').close(); };
+    $('noteText').onkeydown = e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) $('noteForm').requestSubmit(); };
+    $('noteDelete').onclick = () => { saveNote(''); $('noteDialog').close(); };
+
+    document.addEventListener('keydown', e => {
+        if (document.querySelector('dialog[open]') || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+        if (e.key === 'ArrowRight' && !$('prevWeek').disabled) setWeek(addDays(state.week, -7));
+        if (e.key === 'ArrowLeft' && !$('nextWeek').disabled) setWeek(addDays(state.week, 7));
+        if (e.key === 'Escape' && (state.filter || state.search)) {
+            state.filter = ''; state.search = '';
+            $('search').value = ''; $('subjectFilter').value = '';
+            render();
+        }
+    });
+
+    // גרירת קובץ JSON לעמוד
+    let dragDepth = 0;
+    const hasFiles = e => e.dataTransfer && [...e.dataTransfer.types].includes('Files');
+    window.addEventListener('dragenter', e => { if (!hasFiles(e)) return; e.preventDefault(); dragDepth++; document.body.classList.add('dragging'); });
+    window.addEventListener('dragleave', e => { if (!hasFiles(e)) return; if (--dragDepth <= 0) { dragDepth = 0; document.body.classList.remove('dragging'); } });
+    window.addEventListener('dragover', e => { if (hasFiles(e)) e.preventDefault(); });
+    window.addEventListener('drop', e => {
+        if (!hasFiles(e)) return;
+        e.preventDefault();
+        dragDepth = 0;
+        document.body.classList.remove('dragging');
+        readImportFile(e.dataTransfer.files[0]);
+    });
+
+    // סנכרון בין לשוניות פתוחות
+    window.addEventListener('storage', e => {
+        if (![KEYS.attendance, KEYS.events, KEYS.notes].includes(e.key)) return;
+        state.attendance = load(KEYS.attendance);
+        state.events = load(KEYS.events);
+        state.notes = load(KEYS.notes);
+        render();
+    });
+
+    /* ===================== הפעלה ===================== */
+
+    fillHourSelect($('evStart'));
+    fillHourSelect($('evEnd'));
+    renderFilterOptions();
+    render();
+
+    // רענון כל 30 שניות; הטבלה והסיכום מתרנדרים מחדש כשהשעה הנוכחית מתחלפת
+    let lastHourMark = `${ymd(new Date())}_${currentHour(new Date())}`;
+    setInterval(() => {
+        renderLive();
+        const mark = `${ymd(new Date())}_${currentHour(new Date())}`;
+        if (mark !== lastHourMark) { lastHourMark = mark; render(); }
+    }, 30000);
 </script>
-
 </body>
 </html>
