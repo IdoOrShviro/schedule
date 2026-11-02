@@ -1564,8 +1564,8 @@
     }
 
     function fillHourSelect(sel) {
-        // ⁦...⁩ שומר על סדר השעות משמאל לימין בתוך טקסט עברי
-        sel.innerHTML = HOURS.map(h => `<option value="${h.id}">שעה ${h.id} (⁦${h.start}–${h.end}⁩)</option>`).join('');
+        // \u2066...\u2069 שומר על סדר השעות משמאל לימין בתוך טקסט עברי
+        sel.innerHTML = HOURS.map(h => `<option value="${h.id}">שעה ${h.id} (\u2066${h.start}–${h.end}\u2069)</option>`).join('');
     }
 
     function openEvent(dateStr, idx) {
@@ -1695,7 +1695,7 @@
     function readImportFile(file) {
         if (!file) return;
         if (!/\.json$/i.test(file.name) && file.type !== 'application/json') {
-            toast('צריך לבחור קובץ ‎.json', true);
+            toast('צריך לבחור קובץ \u200E.json', true);
             return;
         }
         const reader = new FileReader();
