@@ -273,6 +273,8 @@
         transition: box-shadow .15s;
     }
     .field:focus { box-shadow: inset 0 0 0 1px var(--primary), 0 0 0 4px var(--primary-soft); }
+    /* רשימות נפתחות: רקע אטום כדי שהטקסט לא ייעלם על לבן */
+    select.field option { background: var(--glass-strong); color: var(--text); }
     .search { width: 240px; }
 
     .legend { display: flex; gap: 6px; flex-wrap: wrap; font-size: .76rem; font-weight: 600; color: var(--muted); }
@@ -1562,7 +1564,8 @@
     }
 
     function fillHourSelect(sel) {
-        sel.innerHTML = HOURS.map(h => `<option value="${h.id}">שעה ${h.id} (${h.start}–${h.end})</option>`).join('');
+        // ⁦...⁩ שומר על סדר השעות משמאל לימין בתוך טקסט עברי
+        sel.innerHTML = HOURS.map(h => `<option value="${h.id}">שעה ${h.id} (⁦${h.start}–${h.end}⁩)</option>`).join('');
     }
 
     function openEvent(dateStr, idx) {
